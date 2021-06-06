@@ -1,0 +1,78 @@
+{
+  "pluginAlias": "TuyaIR",
+  "pluginType": "platform",
+  "singular": true,
+  "schema": {
+    "type": "object",
+    "properties": {
+      "name": {
+        "title": "Name",
+        "type": "string",
+        "required": true,
+        "default": "TuyaIR"
+      },
+      "client_id": {
+        "title": "Client Id",
+        "type": "string",
+        "required": true,
+        "default": "",
+        "description": "Your Tuya IOT cloud project's client Id"
+      },
+      "secret": {
+        "title": "Client Secret",
+        "type": "string",
+        "required": true,
+        "default": "",
+        "description": "Your Tuya IOT cloud project's secret"
+      },
+      "region": {
+        "title": "Device Region",
+        "type": "string",
+        "required": true,
+        "default": "",
+        "oneOf": [
+          {
+            "title": "India",
+            "enum": [
+              "in"
+            ]
+          },
+          {
+            "title": "Europe",
+            "enum": [
+              "eu"
+            ]
+          },
+          {
+            "title": "China",
+            "enum": [
+              "cn"
+            ]
+          }
+          ,
+          {
+            "title": "America",
+            "enum": [
+              "us"
+            ]
+          }
+        ]
+      },
+      "deviceId": {
+        "title": "IR Blaster Device Id",
+        "type": "string",
+        "required": true,
+        "default": "",
+        "description": "Device Id of IR Blaster"
+      },
+      "devices": {
+        "title": "IR Blaster Device Id",
+        "type": "array",
+        "items": {
+          "type": "string"
+        },
+        "description": "Device Ids of devices added for IR blaster to control"
+      }
+    }
+  }
+}
