@@ -3,6 +3,7 @@ import { Config } from "./Config";
 
 const CryptoJS = require('crypto-js');
 const request = require('request');
+import https from 'https';
 
 export class TuyaAPIHelper {
     private constructor(config: Config, log: Logger) {
@@ -66,7 +67,7 @@ export class TuyaAPIHelper {
         })
     }
 
-    sendACCommand(deviceId: string, remoteId: string, command: string, value: string|number, cb) {
+    sendACCommand(deviceId: string, remoteId: string, command: string, value: string | number, cb) {
         let commandObj = {
             "code": command,
             "value": value
@@ -101,9 +102,8 @@ export class TuyaAPIHelper {
                 'sign_method': 'HMAC-SHA256'
             }
         };
+
         request.get(options, function (error, response, body) {
-            // body is the decompressed response body
-            //console.log('server encoded the data as: ' + (response.headers['content-encoding'] || 'identity'))
             _this.log.debug("API call successful.");
             cb(body);
         })
@@ -125,7 +125,7 @@ export class TuyaAPIHelper {
                 't': this.timestamp,
                 'access_token': this.accessToken,
                 'sign_method': 'HMAC-SHA256',
-                'Content-Type':'application/json'
+                'Content-Type': 'application/json'
             },
             body: JSON.stringify(body)
         };

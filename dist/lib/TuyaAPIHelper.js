@@ -89,8 +89,6 @@ class TuyaAPIHelper {
             }
         };
         request.get(options, function (error, response, body) {
-            // body is the decompressed response body
-            //console.log('server encoded the data as: ' + (response.headers['content-encoding'] || 'identity'))
             _this.log.debug("API call successful.");
             cb(body);
         })
