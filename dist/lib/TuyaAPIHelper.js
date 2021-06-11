@@ -31,7 +31,7 @@ class TuyaAPIHelper {
                 _this.refreshToken = body.result.refresh_token;
                 setTimeout(() => {
                     this._refreshToken();
-                }, body.result.expire_time * 1000);
+                }, (body.result.expire_time - 5) * 1000);
             }
             cb();
         });
@@ -69,7 +69,19 @@ class TuyaAPIHelper {
         });
     }
     _refreshToken() {
-        this.log.warn("Need to refresh token now...");
+        this.log.info("Need to refresh token now...");
+        var _this = this;
+        this._loginApiCall(this.apiHost + "/v1.0/token/" + this.refreshToken, {}, (_body) => {
+            var body = JSON.parse(_body);
+            if (body.success) {
+                _this.accessToken = body.result.access_token;
+                _this.refreshToken = body.result.refresh_token;
+                this.log.info(`Token refreshed successfully. Next refresh after ${body.result.expire_time} seconds`);
+                setTimeout(() => {
+                    this._refreshToken();
+                }, (body.result.expire_time - 5) * 1000);
+            }
+        });
     }
     _calculateSign() {
         this.timestamp = new Date().getTime();
