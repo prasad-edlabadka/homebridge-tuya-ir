@@ -31,7 +31,7 @@ export declare class AirConditionerAccessory {
      *
      * If your device takes time to respond you should update the status of your device
      * asynchronously instead using the `updateCharacteristic` method instead.
-  
+
      * @example
      * this.service.updateCharacteristic(this.platform.Characteristic.On, true)
      */

@@ -61,8 +61,7 @@ export class TuyaAPIHelper {
                     });
                 }
             } else {
-                //Do something when API returns
-                cb([]);
+                cb(body.result);
             }
         })
     }

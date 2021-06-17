@@ -6,7 +6,8 @@ const AirConditionerAccessory_1 = require("./lib/AirConditionerAccessory");
 const PLATFORM_NAME = 'TuyaIR';
 const PLUGIN_NAME = 'homebridge-tuya-ir';
 const CLASS_DEF = {
-    infrared_ac: AirConditionerAccessory_1.AirConditionerAccessory
+    // 5 is infrared_ac
+    '5': AirConditionerAccessory_1.AirConditionerAccessory
 };
 /**
  * HomebridgePlatform
@@ -65,12 +66,13 @@ class TuyaIRPlatform {
         tuya.start(this.api, this.config, (devices) => {
             //loop over the discovered devices and register each one if it has not already been registered
             for (var device of devices) {
+                console.log(device);
                 // generate a unique id for the accessory this should be generated from
                 // something globally unique, but constant, for example, the device serial
                 // number or MAC address
                 device.ir_id = this.config.deviceId;
-                const Accessory = CLASS_DEF[device.category];
-                const uuid = this.api.hap.uuid.generate(device.id);
+                const Accessory = CLASS_DEF[device.category_id];
+                const uuid = this.api.hap.uuid.generate(device.remote_id);
                 // see if an accessory with the same uuid has already been registered and restored from
                 // the cached devices we stored in the `configureAccessory` method above
                 const existingAccessory = this.accessories.find(accessory => accessory.UUID === uuid);
@@ -99,7 +101,7 @@ class TuyaIRPlatform {
                         // the accessory does not yet exist, so we need to create it
                         this.log.info('Adding new accessory:', device.name);
                         // create a new accessory
-                        const accessory = new this.api.platformAccessory(device.name, uuid);
+                        const accessory = new this.api.platformAccessory(device.remote_name, uuid);
                         // store a copy of the device object in the `accessory.context`
                         // the `context` property can be used to store any data about the accessory you may need
                         accessory.context.device = device;

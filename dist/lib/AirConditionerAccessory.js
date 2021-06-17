@@ -28,7 +28,7 @@ class AirConditionerAccessory {
         this.accessory.getService(this.platform.Service.AccessoryInformation)
             .setCharacteristic(this.platform.Characteristic.Manufacturer, accessory.context.device.product_name)
             .setCharacteristic(this.platform.Characteristic.Model, 'Unknown')
-            .setCharacteristic(this.platform.Characteristic.SerialNumber, accessory.context.device.id);
+            .setCharacteristic(this.platform.Characteristic.SerialNumber, accessory.context.device.remote_id);
         // get the LightBulb service if it exists, otherwise create a new LightBulb service
         // you can create multiple services for each accessory
         this.service = this.accessory.getService(this.platform.Service.HeaterCooler) || this.accessory.addService(this.platform.Service.HeaterCooler);
@@ -67,7 +67,7 @@ class AirConditionerAccessory {
         // implement your own code to turn your device on/off
         var command = value ? 1 : 0;
         this.acStates.On = value;
-        this.tuya.sendACCommand(this.parentId, this.accessory.context.device.id, "power", command, () => {
+        this.tuya.sendACCommand(this.parentId, this.accessory.context.device.remote_id, "power", command, () => {
             this.platform.log.info(`${this.accessory.displayName} is now ${command == 0 ? 'Off' : 'On'}`);
         });
     }
@@ -80,7 +80,7 @@ class AirConditionerAccessory {
      *
      * If your device takes time to respond you should update the status of your device
      * asynchronously instead using the `updateCharacteristic` method instead.
-  
+
      * @example
      * this.service.updateCharacteristic(this.platform.Characteristic.On, true)
      */
@@ -100,7 +100,7 @@ class AirConditionerAccessory {
         //Change termperature
         var command = value;
         this.acStates.temperature = command;
-        this.tuya.sendACCommand(this.parentId, this.accessory.context.device.id, "temp", command, () => {
+        this.tuya.sendACCommand(this.parentId, this.accessory.context.device.remote_id, "temp", command, () => {
             this.platform.log.info(`${this.accessory.displayName} temperature is set to ${command} degrees.`);
         });
     }
@@ -111,7 +111,7 @@ class AirConditionerAccessory {
         //Change termperature
         var command = value;
         this.acStates.fan = command;
-        this.tuya.sendACCommand(this.parentId, this.accessory.context.device.id, "wind", command, () => {
+        this.tuya.sendACCommand(this.parentId, this.accessory.context.device.remote_id, "wind", command, () => {
             this.platform.log.info(`${this.accessory.displayName} Fan is set to ${command == 0 ? "auto" : command}.`);
         });
     }

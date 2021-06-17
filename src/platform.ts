@@ -5,7 +5,8 @@ import { AirConditionerAccessory } from './lib/AirConditionerAccessory';
 const PLATFORM_NAME = 'TuyaIR';
 const PLUGIN_NAME = 'homebridge-tuya-ir';
 const CLASS_DEF = {
-  infrared_ac: AirConditionerAccessory
+  // 5 is infrared_ac
+  '5': AirConditionerAccessory
 };
 /**
  * HomebridgePlatform
@@ -22,9 +23,9 @@ export class TuyaIRPlatform implements DynamicPlatformPlugin {
 
 
   constructor(
-    public readonly log: Logger,
-    public readonly config: PlatformConfig,
-    public readonly api: API,
+      public readonly log: Logger,
+      public readonly config: PlatformConfig,
+      public readonly api: API,
   ) {
     this.log.debug('Finished initializing platform:', this.config.name);
 
@@ -71,13 +72,13 @@ export class TuyaIRPlatform implements DynamicPlatformPlugin {
 
       //loop over the discovered devices and register each one if it has not already been registered
       for (var device of devices) {
-
+        console.log(device);
         // generate a unique id for the accessory this should be generated from
         // something globally unique, but constant, for example, the device serial
         // number or MAC address
         device.ir_id = this.config.deviceId;
-        const Accessory = CLASS_DEF[device.category];
-        const uuid = this.api.hap.uuid.generate(device.id);
+        const Accessory = CLASS_DEF[device.category_id];
+        const uuid = this.api.hap.uuid.generate(device.remote_id);
 
         // see if an accessory with the same uuid has already been registered and restored from
         // the cached devices we stored in the `configureAccessory` method above
@@ -111,7 +112,7 @@ export class TuyaIRPlatform implements DynamicPlatformPlugin {
             this.log.info('Adding new accessory:', device.name);
 
             // create a new accessory
-            const accessory = new this.api.platformAccessory(device.name, uuid);
+            const accessory = new this.api.platformAccessory(device.remote_name, uuid);
 
             // store a copy of the device object in the `accessory.context`
             // the `context` property can be used to store any data about the accessory you may need
