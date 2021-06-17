@@ -72,7 +72,6 @@ export class TuyaIRPlatform implements DynamicPlatformPlugin {
 
       //loop over the discovered devices and register each one if it has not already been registered
       for (var device of devices) {
-        console.log(device);
         // generate a unique id for the accessory this should be generated from
         // something globally unique, but constant, for example, the device serial
         // number or MAC address
