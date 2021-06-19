@@ -31,7 +31,7 @@ class TuyaAPIHelper {
                 _this.refreshToken = body.result.refresh_token;
                 setTimeout(() => {
                     this._refreshToken();
-                }, 5000); //(body.result.expire_time - 5) * 1000);
+                }, (body.result.expire_time - 5) * 1000);
             }
             cb();
         });
