@@ -49,14 +49,3 @@ If you have new accessory logic for a new device, please add a function defined 
 ## Donating
 
 Please donate to a local pet shelter, or food pantry. It's been a wild time, but we can do our part by helping others. 
-
-## Clone As Template
-
-Click the link below to create a new GitHub Repository using this template, or click the *Use This Template* button above.
-
-<span align="center">
-
-### [Create New Repository From Template](https://github.com/homebridge/homebridge-plugin-template/generate)
-
-</span>
-

@@ -49,9 +49,9 @@ export class TuyaAPIHelper {
     fetchDevices(deviceId: string, cb) {
         this._apiCall(this.apiHost + `/v1.0/infrareds/${deviceId}/remotes`, "GET", {}, (_body) => {
             var body = JSON.parse(_body);
+            var devs: any[] = [];
             if (body.result.length == 0) {
                 this.log.warn("API didn't return any devices Using hardcoded devices...");
-                var devs: any[] = [];
                 for (var i = 0; i < this.config.devices.length; i++) {
                     this._apiCall(this.apiHost + `/v1.0/devices/${this.config.devices[i].remoteId}`, "GET", {}, (_b) => {
                         devs.push(JSON.parse(_b).result);
@@ -61,8 +61,15 @@ export class TuyaAPIHelper {
                     });
                 }
             } else {
-                //Do something when API returns
-                cb([]);
+                this.log.warn(`API returned ${body.result.length} remotes...`);
+                for (var i = 0; i < body.result.length; i++) {
+                    this._apiCall(this.apiHost + `/v1.0/devices/${body.result[i].remote_id}`, "GET", {}, (_b) => {
+                        devs.push(JSON.parse(_b).result);
+                        if (devs.length == body.result.length) {
+                            cb(devs);
+                        }
+                    });
+                }
             }
         })
     }
@@ -86,13 +93,14 @@ export class TuyaAPIHelper {
         this._loginApiCall(this.apiHost + "/v1.0/token/" + this.refreshToken, {}, (_body) => {
             var body = JSON.parse(_body);
             if (body.success) {
-
                 _this.accessToken = body.result.access_token;
                 _this.refreshToken = body.result.refresh_token;
-                this.log.info(`Token refreshed successfully. Next refresh after ${body.result.expire_time} seconds`);
+                _this.log.info(`Token refreshed successfully. Next refresh after ${body.result.expire_time} seconds`);
                 setTimeout(() => {
                     this._refreshToken();
                 }, (body.result.expire_time - 5) * 1000);
+            } else {
+                _this.log.error(`Unable to refresh token: ${body.msg}`)
             }
         });
     }
@@ -144,7 +152,6 @@ export class TuyaAPIHelper {
         };
         request(options, function (error, response, body) {
             // body is the decompressed response body
-            //console.log('server encoded the data as: ' + (response.headers['content-encoding'] || 'identity'))
             _this.log.debug("API call successful.");
             cb(body);
         })
