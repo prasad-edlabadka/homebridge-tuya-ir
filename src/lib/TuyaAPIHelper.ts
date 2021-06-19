@@ -40,7 +40,7 @@ export class TuyaAPIHelper {
                 _this.refreshToken = body.result.refresh_token;
                 setTimeout(() => {
                     this._refreshToken();
-                }, (body.result.expire_time - 5) * 1000);
+                }, 5000);//(body.result.expire_time - 5) * 1000);
             }
             cb();
         });
@@ -105,15 +105,15 @@ export class TuyaAPIHelper {
         });
     }
 
-    _calculateSign() {
+    _calculateSign(withAccessToken: boolean) {
         this.timestamp = new Date().getTime();
-        var str = this.clientId + this.accessToken + this.timestamp;
+        var str = withAccessToken ? this.clientId + this.accessToken + this.timestamp : this.clientId + this.timestamp
         this.signKey = CryptoJS.HmacSHA256(str, this.clientSecret).toString().toUpperCase();
     }
 
     _loginApiCall(endpoint: string, body: object, cb) {
         var _this = this;
-        this._calculateSign();
+        this._calculateSign(false);
         var options = {
             url: endpoint,
             headers: {
@@ -136,7 +136,7 @@ export class TuyaAPIHelper {
     _apiCall(endpoint: string, method: string, body: object, cb) {
         this.log.debug(`Calling endpoint ${endpoint}`);
         var _this = this;
-        this._calculateSign();
+        this._calculateSign(true);
         var options = {
             method: method,
             url: endpoint,

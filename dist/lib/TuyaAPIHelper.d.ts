@@ -17,7 +17,7 @@ export declare class TuyaAPIHelper {
     fetchDevices(deviceId: string, cb: any): void;
     sendACCommand(deviceId: string, remoteId: string, command: string, value: string | number, cb: any): void;
     _refreshToken(): void;
-    _calculateSign(): void;
+    _calculateSign(withAccessToken: boolean): void;
     _loginApiCall(endpoint: string, body: object, cb: any): void;
     _apiCall(endpoint: string, method: string, body: object, cb: any): void;
 }
