@@ -53,8 +53,14 @@ export class TuyaAPIHelper {
             if (body.result.length == 0) {
                 this.log.warn("API didn't return any devices Using hardcoded devices...");
                 for (var i = 0; i < this.config.devices.length; i++) {
-                    this._apiCall(this.apiHost + `/v1.0/devices/${this.config.devices[i].remoteId}`, "GET", {}, (_b) => {
-                        devs.push(JSON.parse(_b).result);
+                    this._apiCall(this.apiHost + `/v1.0/devices/${this.config.devices[i].remoteId}`, "GET", {}, (_b, err) => {
+                        if (err) {
+                            this.log.error("Failed to get remote configuration for: " + this.config.devices[i].remoteId);
+                            devs.push({});
+                        } else {
+                            this.log.debug(_b)
+                            devs.push(JSON.parse(_b).result);
+                        }
                         if (devs.length == this.config.devices.length) {
                             cb(devs);
                         }
@@ -63,9 +69,15 @@ export class TuyaAPIHelper {
             } else {
                 this.log.warn(`API returned ${body.result.length} remotes...`);
                 for (var i = 0; i < body.result.length; i++) {
-                    this._apiCall(this.apiHost + `/v1.0/devices/${body.result[i].remote_id}`, "GET", {}, (_b) => {
-                        devs.push(JSON.parse(_b).result);
-                        if (devs.length == body.result.length) {
+                    this._apiCall(this.apiHost + `/v1.0/devices/${body.result[i].remote_id}`, "GET", {}, (_b, err) => {
+                        if (err) {
+                            this.log.error("Failed to get remote configuration for: " + body.result[i].remote_id);
+                            devs.push({});
+                        } else {
+                            this.log.debug(_b)
+                            devs.push(JSON.parse(_b).result);
+                        }
+                        if (devs.length == this.config.devices.length) {
                             cb(devs);
                         }
                     });
@@ -153,7 +165,7 @@ export class TuyaAPIHelper {
         request(options, function (error, response, body) {
             // body is the decompressed response body
             _this.log.debug("API call successful.");
-            cb(body);
+            cb(body, error);
         })
             .on('error', (err) => {
                 _this.log.error("API call failed.");
