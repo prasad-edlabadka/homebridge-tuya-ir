@@ -6,6 +6,15 @@
 </p>
 
 # Homebridge Tuya IR
+[![npm](https://img.shields.io/npm/v/homebridge-tuya-ir.svg)](https://www.npmjs.com/package/homebridge-tuya-ir)
+![GitHub](https://img.shields.io/github/license/prasad-edlabadka/homebridge-tuya-ir)
+[![npm](https://img.shields.io/npm/dt/homebridge-tuya-ir.svg)](https://www.npmjs.com/package/homebridge-tuya-ir)
+![GitHub issues](https://img.shields.io/github/issues-raw/prasad-edlabadka/homebridge-tuya-ir)
+![GitHub pull requests](https://img.shields.io/github/issues-pr-raw/prasad-edlabadka/homebridge-tuya-ir)
+
+![GitHub contributors](https://img.shields.io/github/contributors-anon/prasad-edlabadka/homebridge-tuya-ir)
+![GitHub last commit](https://img.shields.io/github/last-commit/prasad-edlabadka/homebridge-tuya-ir)
+
 
 Control your Tuya IR Blaster baed devices in HomeKit. Also works with Smart Home IR Blaster.
 
