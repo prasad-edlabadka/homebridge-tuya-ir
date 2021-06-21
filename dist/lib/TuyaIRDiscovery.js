@@ -16,7 +16,7 @@ class TuyaIRDiscovery extends EventEmitter {
         this.config = new Config_1.Config(props.client_id, props.secret, props.region, props.deviceId, props.devices);
         var helper = TuyaAPIHelper_1.TuyaAPIHelper.Instance(this.config, this.log);
         helper.login(() => {
-            this.log.info("Logged in. Fetching configured remotes...");
+            this.log.info("Fetching configured remotes...");
             helper.fetchDevices(this.config.deviceId, (devs) => {
                 cb(devs);
             });

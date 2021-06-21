@@ -81,10 +81,14 @@ export class AirConditionerAccessory {
     async setOn(value: CharacteristicValue) {
         // implement your own code to turn your device on/off
         var command = (value as boolean) ? 1 : 0;
-        this.acStates.On = value as boolean;
 
-        this.tuya.sendACCommand(this.parentId, this.accessory.context.device.id, "power", command, () => {
-            this.platform.log.info(`${this.accessory.displayName} is now ${command == 0 ? 'Off' : 'On'}`);
+        this.tuya.sendACCommand(this.parentId, this.accessory.context.device.id, "power", command, (body) => {
+            if (!body.success) {
+                this.platform.log.error(`Failed to change AC status due to error ${body.msg}`);
+            } else {
+                this.platform.log.info(`${this.accessory.displayName} is now ${command == 0 ? 'Off' : 'On'}`);
+                this.acStates.On = value as boolean;
+            }
         });
     }
 
@@ -119,10 +123,14 @@ export class AirConditionerAccessory {
     async setCoolingThresholdTemperatureCharacteristic(value: CharacteristicValue) {
         //Change termperature
         var command = value as number;
-        this.acStates.temperature = command;
-
-        this.tuya.sendACCommand(this.parentId, this.accessory.context.device.id, "temp", command, () => {
-            this.platform.log.info(`${this.accessory.displayName} temperature is set to ${command} degrees.`);
+        
+        this.tuya.sendACCommand(this.parentId, this.accessory.context.device.id, "temp", command, (body) => {
+            if (!body.success) {
+                this.platform.log.error(`Failed to change AC temperature due to error ${body.msg}`);
+            } else {
+                this.platform.log.info(`${this.accessory.displayName} temperature is set to ${command} degrees.`);
+                this.acStates.temperature = command;
+            }
         });
     }
 
@@ -131,14 +139,16 @@ export class AirConditionerAccessory {
     }
 
     async setRotationSpeedCharacteristic(value: CharacteristicValue) {
-        //Change termperature
+        //Change fan speed
         var command = value as number;
-        this.acStates.fan = command;
 
-        this.tuya.sendACCommand(this.parentId, this.accessory.context.device.id, "wind", command, () => {
-            this.platform.log.info(`${this.accessory.displayName} Fan is set to ${command==0?"auto":command}.`);
+        this.tuya.sendACCommand(this.parentId, this.accessory.context.device.id, "wind", command, (body) => {
+            if (!body.success) {
+                this.platform.log.error(`Failed to change AC fan due to error ${body.msg}`);
+            } else {
+                this.platform.log.info(`${this.accessory.displayName} Fan is set to ${command == 0 ? "auto" : command}.`);
+                this.acStates.fan = command;
+            }
         });
     }
-
-
 }
