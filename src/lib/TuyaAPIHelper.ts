@@ -58,7 +58,7 @@ export class TuyaAPIHelper {
             } else {
                 var body = JSON.parse(_body);
                 var devs: any[] = [];
-                if (body.result.length == 0) {
+                if (!body.result) {
                     this.log.warn("API didn't return any devices Using hardcoded devices...");
                     for (var i = 0; i < this.config.devices.length; i++) {
                         this._apiCall(this.apiHost + `/v1.0/devices/${this.config.devices[i].remoteId}`, "GET", {}, (_b, err) => {
