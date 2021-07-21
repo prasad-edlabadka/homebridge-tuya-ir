@@ -33,6 +33,13 @@ Search for "Tuya IR" in [homebridge-config-ui-x](https://github.com/oznu/homebri
 sudo npm install -g homebridge-tuya-ir
 ```
 
+## Authorization
+> Tuya IoT Platform
+1. Search for "IR Control Hub Open Service" in Tuya IoT Platform Service
+2. Subscribe to the service, authorize the project you are working on.
+
+<img src="./docs/tuya_iot_platform.png">
+
 ## Configuration
 > UI
 
