@@ -63,12 +63,20 @@ export class TuyaAPIHelper {
                     this.log.warn("API didn't return any devices Using hardcoded devices...");
                     for (var i = 0; i < this.config.devices.length; i++) {
                         this._apiCall(this.apiHost + `/v1.0/devices/${this.config.devices[i].remoteId}`, "GET", {}, (_b, err) => {
+
                             if (err) {
                                 this.log.error("Failed to get remote configuration for: " + this.config.devices[i].remoteId);
                                 devs.push({});
                             } else {
                                 this.log.debug(_b)
-                                devs.push(JSON.parse(_b).result);
+                                let bd = JSON.parse(_b);
+                                if (!bd.success) {
+                                    this.log.error("Failed to get remote configuration for: " + this.config.devices[i].remoteId);
+                                    this.log.error(`Server returned error: '${bd.msg}'`)
+                                    devs.push({});
+                                } else {
+                                    devs.push(bd.result);
+                                }
                             }
                             if (devs.length == this.config.devices.length) {
                                 cb(devs);
@@ -160,7 +168,7 @@ export class TuyaAPIHelper {
         })
             .on('error', (err) => {
                 _this.log.error("API call failed.");
-                _this.log.error(err); 
+                _this.log.error(err);
             })
     }
     _apiCall(endpoint: string, method: string, body: object, cb) {
