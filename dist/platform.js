@@ -63,7 +63,7 @@ class TuyaIRPlatform {
         this.log.info('Starting discovery...');
         var tuya = new TuyaIRDiscovery_1.TuyaIRDiscovery(this.log, this.api);
         tuya.start(this.api, this.config, (devices) => {
-            this.log.info(JSON.stringify(devices));
+            this.log.debug(JSON.stringify(devices));
             //loop over the discovered devices and register each one if it has not already been registered
             for (var device of devices) {
                 if (device) {

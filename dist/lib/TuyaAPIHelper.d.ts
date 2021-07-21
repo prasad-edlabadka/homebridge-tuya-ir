@@ -17,8 +17,10 @@ export declare class TuyaAPIHelper {
     fetchDevices(deviceId: string, cb: any): void;
     sendACCommand(deviceId: string, remoteId: string, command: string, value: string | number, cb: any): void;
     _refreshToken(): void;
-    _calculateSign(withAccessToken: boolean): void;
+    _calculateSign(withAccessToken: boolean, query: string, url: string, httpMethod: string, body?: string): void;
     _loginApiCall(endpoint: string, body: object, cb: any): void;
     _apiCall(endpoint: string, method: string, body: object, cb: any): void;
+    _stringToSign(query: any, url: any, method: any, body: any): {};
+    toJsonObj(params: any, arr: any, map: any): void;
 }
 //# sourceMappingURL=TuyaAPIHelper.d.ts.map

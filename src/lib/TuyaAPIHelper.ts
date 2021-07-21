@@ -3,6 +3,7 @@ import { Config } from "./Config";
 
 const CryptoJS = require('crypto-js');
 const request = require('request');
+const URL = require('url');
 import https from 'https';
 
 export class TuyaAPIHelper {
@@ -85,7 +86,7 @@ export class TuyaAPIHelper {
                                 this.log.debug(_b)
                                 devs.push(JSON.parse(_b).result);
                             }
-                            if (devs.length == this.config.devices.length) {
+                            if (devs.length == body.result.length) {
                                 cb(devs);
                             }
                         });
@@ -102,7 +103,7 @@ export class TuyaAPIHelper {
         }
         this.log.debug(JSON.stringify(commandObj));
         this._apiCall(this.apiHost + `/v1.0/infrareds/${deviceId}/air-conditioners/${remoteId}/command`, "POST", commandObj, (_body, err) => {
-            var body = {success: false, msg: "Failed to invoke API"};
+            var body = { success: false, msg: "Failed to invoke API" };
             if (!err) {
                 body = JSON.parse(_body);
             }
@@ -129,22 +130,27 @@ export class TuyaAPIHelper {
         });
     }
 
-    _calculateSign(withAccessToken: boolean) {
+    _calculateSign(withAccessToken: boolean, query: string, url: string, httpMethod: string, body: string = "") {
         this.timestamp = new Date().getTime();
-        var str = withAccessToken ? this.clientId + this.accessToken + this.timestamp : this.clientId + this.timestamp
+        var signMap = this._stringToSign(query, url, httpMethod, body)
+        var signStr = signMap["signUrl"]
+        var str = withAccessToken ? this.clientId + this.accessToken + this.timestamp + signStr : this.clientId + this.timestamp + signStr;
         this.signKey = CryptoJS.HmacSHA256(str, this.clientSecret).toString().toUpperCase();
     }
 
     _loginApiCall(endpoint: string, body: object, cb) {
         var _this = this;
-        this._calculateSign(false);
+        let url = URL.parse(endpoint, true);
+
+        this._calculateSign(false, url.query, url.pathname, 'GET');
         var options = {
             url: endpoint,
             headers: {
                 'client_id': this.clientId,
                 'sign': this.signKey,
                 't': this.timestamp,
-                'sign_method': 'HMAC-SHA256'
+                'sign_method': 'HMAC-SHA256',
+                'nonce': ''
             }
         };
 
@@ -154,13 +160,14 @@ export class TuyaAPIHelper {
         })
             .on('error', (err) => {
                 _this.log.error("API call failed.");
-                _this.log.error(err);
+                _this.log.error(err); 
             })
     }
     _apiCall(endpoint: string, method: string, body: object, cb) {
         this.log.debug(`Calling endpoint ${endpoint}`);
         var _this = this;
-        this._calculateSign(true);
+        let url = URL.parse(endpoint, true);
+        this._calculateSign(true, url.query, url.pathname, method, JSON.stringify(body));
         var options = {
             method: method,
             url: endpoint,
@@ -177,6 +184,7 @@ export class TuyaAPIHelper {
         request(options, function (error, response, body) {
             // body is the decompressed response body
             _this.log.debug("API call successful.");
+            _this.log.debug(body);
             cb(body, error);
         })
             .on('error', (err) => {
@@ -184,4 +192,40 @@ export class TuyaAPIHelper {
                 _this.log.error(err);
             })
     }
+
+    // Generate signature string
+    _stringToSign(query, url, method, body) {
+        var sha256 = "";
+        var headersStr = "";
+        var map = {};
+        var arr = [];
+        var bodyStr = body || "";
+        if (query) {
+            this.toJsonObj(query, arr, map);
+        }
+        sha256 = CryptoJS.SHA256(bodyStr);
+        if (arr.length > 0) {
+            arr = arr.sort();
+            url += '?';
+            arr.forEach(function (item) {
+                url += item + "=" + map[item] + "&";
+            });
+            url = url.substring(0, url.length - 1);
+        }
+
+        map["signUrl"] = method + "\n" + sha256 + "\n" + headersStr + "\n" + url;
+        map["url"] = url;
+        return map;
+    }
+
+    toJsonObj(params, arr, map) {
+        var jsonBodyStr = JSON.stringify(params);
+        var jsonBody = JSON.parse(jsonBodyStr);
+        for (var key in jsonBody) {
+            arr.push(key);
+            map[key] = jsonBody[key];
+        }
+    }
+
+
 }
