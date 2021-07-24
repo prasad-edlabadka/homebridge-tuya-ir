@@ -35,9 +35,11 @@ sudo npm install -g homebridge-tuya-ir
 
 ## Authorization
 > Tuya IoT Platform
+You need to attach multiple services to your Tuya IOT project.
 1. Search for "IR Control Hub Open Service" in Tuya IoT Platform Service
 2. Subscribe to the service, authorize the project you are working on.
 
+Repeat the steps for all the highligted services in the following image
 <img src="./docs/tuya_iot_platform.png">
 
 ## Configuration
