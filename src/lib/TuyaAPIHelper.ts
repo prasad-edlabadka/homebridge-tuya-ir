@@ -4,7 +4,6 @@ import { Config } from "./Config";
 const CryptoJS = require('crypto-js');
 const request = require('request');
 const URL = require('url');
-import https from 'https';
 
 export class TuyaAPIHelper {
     private constructor(config: Config, log: Logger) {
