@@ -20,6 +20,7 @@ Control your Tuya IR Blaster baed devices in HomeKit. Also works with Smart Home
 
 ## Supported Devices
 * Air Conditioner
+* Fan
 
 ## Installation Instructions
 
@@ -58,7 +59,7 @@ Repeat the steps for all the highligted services in the following image
 
 ## Known Issues
 
-1. Tuya API doesn't return devices added to IR blaster. Thus, you need to add them in your app and then provide IDs in the plugin configuration. 
+1. Tuya API doesn't always return devices added to IR blaster based on OEM hardware. Thus, you need to add them in your app and then provide IDs in the plugin configuration. This is configuruable in the configuration.
 
 ## Contributing
 

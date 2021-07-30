@@ -1,11 +1,13 @@
 import { API, DynamicPlatformPlugin, Logger, PlatformAccessory, PlatformConfig, Service, Characteristic } from 'homebridge';
 import { TuyaIRDiscovery } from './lib/TuyaIRDiscovery';
 import { AirConditionerAccessory } from './lib/AirConditionerAccessory';
+import { FanAccessory } from './lib/FanAccessory';
 
 const PLATFORM_NAME = 'TuyaIR';
 const PLUGIN_NAME = 'homebridge-tuya-ir';
 const CLASS_DEF = {
-  infrared_ac: AirConditionerAccessory
+  infrared_ac: AirConditionerAccessory,
+  infrared_fan: FanAccessory
 };
 /**
  * HomebridgePlatform

@@ -5,14 +5,16 @@ export class Config {
     public secret: string = "";
     public region: string = "";
     public deviceId: string = "";
+    public autoFetchRemotes: boolean = true;
     public devices: Device[] = [];
-    constructor(client_id?: string, secret?: string, region?: string, deviceId?: string, devices?: object[]) {
+    constructor(client_id?: string, secret?: string, region?: string, deviceId?: string, autoFetchRemotes = true, devices?: object[]) {
         this.client_id = client_id || "";
         this.secret = secret || "";
         this.region = region || "";
         this.deviceId = deviceId || "";
+        this.autoFetchRemotes = autoFetchRemotes;
         if (devices) {
-            for(var i=0;i<devices.length;i++) {
+            for (var i = 0; i < devices.length; i++) {
                 this.devices.push(new Device(devices[i]));
             }
         }

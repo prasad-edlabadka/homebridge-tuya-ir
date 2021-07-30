@@ -15,7 +15,10 @@ export declare class TuyaAPIHelper {
     static Instance(config: Config, log: Logger): TuyaAPIHelper;
     login(cb: any): void;
     fetchDevices(deviceId: string, cb: any): void;
+    _manualFetch(cb: any): void;
     sendACCommand(deviceId: string, remoteId: string, command: string, value: string | number, cb: any): void;
+    sendFanCommand(deviceId: string, remoteId: string, command: string | number, cb: any): void;
+    getFanCommands(deviceId: string, remoteId: string, cb: any): void;
     _refreshToken(): void;
     _calculateSign(withAccessToken: boolean, query: string, url: string, httpMethod: string, body?: string): void;
     _loginApiCall(endpoint: string, body: object, cb: any): void;

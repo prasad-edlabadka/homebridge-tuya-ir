@@ -17,7 +17,7 @@ export class TuyaIRDiscovery extends EventEmitter {
 
     start(api, props, cb) {
         this.log.info(`Trying to login...`);
-        this.config = new Config(props.client_id, props.secret, props.region, props.deviceId, props.devices);
+        this.config = new Config(props.client_id, props.secret, props.region, props.deviceId, props.autoFetchRemotes, props.devices);
         var helper = TuyaAPIHelper.Instance(this.config, this.log);
         helper.login(() => {
             this.log.info("Fetching configured remotes...");

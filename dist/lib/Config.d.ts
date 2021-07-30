@@ -3,8 +3,9 @@ export declare class Config {
     secret: string;
     region: string;
     deviceId: string;
+    autoFetchRemotes: boolean;
     devices: Device[];
-    constructor(client_id?: string, secret?: string, region?: string, deviceId?: string, devices?: object[]);
+    constructor(client_id?: string, secret?: string, region?: string, deviceId?: string, autoFetchRemotes?: boolean, devices?: object[]);
 }
 export declare class Device {
     remoteId: string;
