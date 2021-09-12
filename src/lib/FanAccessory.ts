@@ -32,9 +32,7 @@ export class FanAccessory {
         private readonly platform: TuyaIRPlatform,
         private readonly accessory: PlatformAccessory,
     ) {
-
         this.parentId = accessory.context.device.ir_id;
-
         this.tuya = TuyaAPIHelper.Instance(new Config(platform.config.client_id, platform.config.secret, platform.config.region, platform.config.deviceId, platform.config.devices), platform.log);
         // set accessory information
         this.accessory.getService(this.platform.Service.AccessoryInformation)!
@@ -67,7 +65,7 @@ export class FanAccessory {
             .onGet(this.getSwingMode.bind(this));               // GET - bind to the `getRotationSpeed` method below
 
         setTimeout(() => {
-            this.tuya.getFanCommands(this.parentId, accessory.context.device.id, (commands) => {
+            this.tuya.getFanCommands(this.parentId, accessory.context.device.id, accessory.context.device.diy, (commands) => {
                 if (commands) {
                     this.powerCommand = commands.power;
                     this.speedCommand = commands.speed;
@@ -77,7 +75,11 @@ export class FanAccessory {
                 }
             })
         }, 0);
+    }
 
+    setup(platform: TuyaIRPlatform, accessory: PlatformAccessory) {
+
+        
     }
 
     /**
@@ -89,7 +91,7 @@ export class FanAccessory {
         if (this.fanStates.On != (value as number)) {
             var command = this.powerCommand;
 
-            this.tuya.sendFanCommand(this.parentId, this.accessory.context.device.id, command, (body) => {
+            this.tuya.sendFanCommand(this.parentId, this.accessory.context.device.id, command, this.accessory.context.device.diy, (body) => {
                 if (!body.success) {
                     this.platform.log.error(`Failed to change Fan status due to error ${body.msg}`);
                 } else {
@@ -128,7 +130,7 @@ export class FanAccessory {
         //Change termperature
         var command = this.speedCommand
 
-        this.tuya.sendFanCommand(this.parentId, this.accessory.context.device.id, command, (body) => {
+        this.tuya.sendFanCommand(this.parentId, this.accessory.context.device.id, command, this.accessory.context.device.diy, (body) => {
             if (!body.success) {
                 this.platform.log.error(`Failed to change Fan speed due to error ${body.msg}`);
             } else {
@@ -136,7 +138,7 @@ export class FanAccessory {
                 this.fanStates.speed = 50;
                 this.service.updateCharacteristic(this.platform.Characteristic.RotationSpeed, 50);
             }
-        });
+        }); 
     }
 
     async getSwingMode(): Promise<CharacteristicValue> {
@@ -147,7 +149,7 @@ export class FanAccessory {
         //Change swing
         var command = this.swingCommand;
 
-        this.tuya.sendFanCommand(this.parentId, this.accessory.context.device.id, command, (body) => {
+        this.tuya.sendFanCommand(this.parentId, this.accessory.context.device.id, command, this.accessory.context.device.diy, (body) => {
             if (!body.success) {
                 this.platform.log.error(`Failed to change Fan swing due to error ${body.msg}`);
             } else {

@@ -24,8 +24,10 @@ class Config {
 exports.Config = Config;
 class Device {
     constructor(dev) {
-        this.remoteId = "";
-        this.remoteId = dev;
+        this.id = "";
+        this.diy = false;
+        this.id = dev.id;
+        this.diy = dev.diy;
     }
 }
 exports.Device = Device;

@@ -22,8 +22,10 @@ export class Config {
 }
 
 export class Device {
-    public remoteId: string = "";
+    public id: string = "";
+    public diy: boolean = false;
     constructor(dev) {
-        this.remoteId = dev;
+        this.id = dev.id;
+        this.diy = dev.diy;
     }
 }

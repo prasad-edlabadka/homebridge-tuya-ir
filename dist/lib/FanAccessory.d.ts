@@ -20,6 +20,7 @@ export declare class FanAccessory {
     private speedCommand;
     private swingCommand;
     constructor(platform: TuyaIRPlatform, accessory: PlatformAccessory);
+    setup(platform: TuyaIRPlatform, accessory: PlatformAccessory): void;
     /**
      * Handle "SET" requests from HomeKit
      * These are sent when the user changes the state of an accessory, for example, turning on a Light bulb.

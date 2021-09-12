@@ -19,8 +19,8 @@
 Control your Tuya IR Blaster baed devices in HomeKit. Also works with Smart Home IR Blaster.
 
 ## Supported Devices
-* Air Conditioner
-* Fan
+* Air Conditioner (Only pre-configured vendor. No DIY devices)
+* Fan (Pre-configured and DIY devices)
 
 ## Installation Instructions
 

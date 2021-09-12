@@ -52,7 +52,7 @@ class FanAccessory {
             .onSet(this.setSwingMode.bind(this)) // SET - bind to the `setRotationSpeed` method below
             .onGet(this.getSwingMode.bind(this)); // GET - bind to the `getRotationSpeed` method below
         setTimeout(() => {
-            this.tuya.getFanCommands(this.parentId, accessory.context.device.id, (commands) => {
+            this.tuya.getFanCommands(this.parentId, accessory.context.device.id, accessory.context.device.diy, (commands) => {
                 if (commands) {
                     this.powerCommand = commands.power;
                     this.speedCommand = commands.speed;
@@ -64,6 +64,8 @@ class FanAccessory {
             });
         }, 0);
     }
+    setup(platform, accessory) {
+    }
     /**
      * Handle "SET" requests from HomeKit
      * These are sent when the user changes the state of an accessory, for example, turning on a Light bulb.
@@ -72,7 +74,7 @@ class FanAccessory {
         // implement your own code to turn your device on/off
         if (this.fanStates.On != value) {
             var command = this.powerCommand;
-            this.tuya.sendFanCommand(this.parentId, this.accessory.context.device.id, command, (body) => {
+            this.tuya.sendFanCommand(this.parentId, this.accessory.context.device.id, command, this.accessory.context.device.diy, (body) => {
                 if (!body.success) {
                     this.platform.log.error(`Failed to change Fan status due to error ${body.msg}`);
                 }
@@ -108,7 +110,7 @@ class FanAccessory {
     async setRotationSpeed(value) {
         //Change termperature
         var command = this.speedCommand;
-        this.tuya.sendFanCommand(this.parentId, this.accessory.context.device.id, command, (body) => {
+        this.tuya.sendFanCommand(this.parentId, this.accessory.context.device.id, command, this.accessory.context.device.diy, (body) => {
             if (!body.success) {
                 this.platform.log.error(`Failed to change Fan speed due to error ${body.msg}`);
             }
@@ -125,7 +127,7 @@ class FanAccessory {
     async setSwingMode(value) {
         //Change swing
         var command = this.swingCommand;
-        this.tuya.sendFanCommand(this.parentId, this.accessory.context.device.id, command, (body) => {
+        this.tuya.sendFanCommand(this.parentId, this.accessory.context.device.id, command, this.accessory.context.device.diy, (body) => {
             if (!body.success) {
                 this.platform.log.error(`Failed to change Fan swing due to error ${body.msg}`);
             }

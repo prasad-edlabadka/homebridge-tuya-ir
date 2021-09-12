@@ -72,12 +72,25 @@
         "description": "Uncheck this box if your IR remotes are not discovered automatically. You will need to add your remote IDs manually below"
       },
       "devices": {
-        "title": "IR Blaster Device ID",
+        "title": "List of configured IR Blaster Rmeotes",
         "type": "array",
         "items": {
-          "type": "string"
+          "type": "object",
+          "title": "Remote Details",
+          "properties": {
+            "id": {
+              "title": "Remote Id",
+              "type": "string",
+              "description": "IR Blaster Device ID",
+              "required": true
+            },
+            "diy": {
+              "title": "Is this Remote DIY?",
+              "type": "boolean",
+              "required": true
+            }
+          }
         },
-        "description": "Device Ids of devices added for IR blaster to control",
         "condition": {
           "functionBody": "return model.autoFetchRemotes === false;"
         }
