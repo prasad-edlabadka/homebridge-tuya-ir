@@ -19,7 +19,8 @@ class AirConditionerAccessory {
         this.acStates = {
             On: false,
             temperature: 16,
-            fan: 0
+            fan: 0,
+            mode: 0
         };
         this.parentId = "";
         this.parentId = accessory.context.device.ir_id;
@@ -41,6 +42,9 @@ class AirConditionerAccessory {
         this.service.getCharacteristic(this.platform.Characteristic.Active)
             .onSet(this.setOn.bind(this)) // SET - bind to the `setOn` method below
             .onGet(this.getOn.bind(this)); // GET - bind to the `getOn` method below
+        this.service.getCharacteristic(this.platform.Characteristic.TargetHeatingCoolingState)
+            .onSet(this.setHeatingCoolingState.bind(this)) // SET - bind to the `setOn` method below
+            .onGet(this.getHeatingCoolingState.bind(this)); // GET - bind to the `getOn` method below
         this.service.getCharacteristic(this.platform.Characteristic.CoolingThresholdTemperature)
             .setProps({
             minValue: 16,
@@ -92,6 +96,57 @@ class AirConditionerAccessory {
     async getOn() {
         // implement your own code to check if the device is on
         const isOn = this.acStates.On;
+        // if you need to return an error to show the device as "Not Responding" in the Home app:
+        // throw new this.platform.api.hap.HapStatusError(this.platform.api.hap.HAPStatus.SERVICE_COMMUNICATION_FAILURE);
+        return isOn;
+    }
+    /**
+     * Handle "SET" requests from HomeKit
+     * These are sent when the user changes the state of an accessory, for example, turning on a Light bulb.
+     */
+    async setHeatingCoolingState(value) {
+        // implement your own code to turn your device on/off
+        var val = value;
+        var command;
+        var modeName = "";
+        if (val == this.platform.Characteristic.TargetHeatingCoolingState.COOL) {
+            command = 0;
+            modeName = "Cool";
+        }
+        else if (val == this.platform.Characteristic.TargetHeatingCoolingState.HEAT) {
+            command = 0;
+            modeName = "Heat";
+        }
+        else {
+            command = 2;
+            modeName = "Auto";
+        }
+        this.tuya.sendACCommand(this.parentId, this.accessory.context.device.id, "mode", command, (body) => {
+            if (!body.success) {
+                this.platform.log.error(`Failed to change AC mode due to error ${body.msg}`);
+            }
+            else {
+                this.platform.log.info(`${this.accessory.displayName} mode is ${modeName}`);
+                this.acStates.mode = val;
+            }
+        });
+    }
+    /**
+     * Handle the "GET" requests from HomeKit
+     * These are sent when HomeKit wants to know the current state of the accessory, for example, checking if a Light bulb is on.
+     *
+     * GET requests should return as fast as possbile. A long delay here will result in
+     * HomeKit being unresponsive and a bad user experience in general.
+     *
+     * If your device takes time to respond you should update the status of your device
+     * asynchronously instead using the `updateCharacteristic` method instead.
+  
+     * @example
+     * this.service.updateCharacteristic(this.platform.Characteristic.On, true)
+     */
+    async getHeatingCoolingState() {
+        // implement your own code to check if the device is on
+        const isOn = this.acStates.mode;
         // if you need to return an error to show the device as "Not Responding" in the Home app:
         // throw new this.platform.api.hap.HapStatusError(this.platform.api.hap.HAPStatus.SERVICE_COMMUNICATION_FAILURE);
         return isOn;
