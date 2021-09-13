@@ -1,8 +1,8 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.AirConditionerAccessory = void 0;
-const Config_1 = require("./Config");
-const TuyaAPIHelper_1 = require("./TuyaAPIHelper");
+const Config_1 = require("../Config");
+const TuyaAPIHelper_1 = require("../TuyaAPIHelper");
 /**
  * Air Conditioner Accessory
  * An instance of this class is created for each accessory your platform registers
@@ -43,8 +43,10 @@ class AirConditionerAccessory {
             .onSet(this.setOn.bind(this)) // SET - bind to the `setOn` method below
             .onGet(this.getOn.bind(this)); // GET - bind to the `getOn` method below
         this.service.getCharacteristic(this.platform.Characteristic.TargetHeatingCoolingState)
-            .onSet(this.setHeatingCoolingState.bind(this)) // SET - bind to the `setOn` method below
-            .onGet(this.getHeatingCoolingState.bind(this)); // GET - bind to the `getOn` method below
+            .onSet(this.setHeatingCoolingState.bind(this)) // SET - bind to the `setHeatingCoolingState` method below
+            .onGet(this.getHeatingCoolingState.bind(this)); // GET - bind to the `getHeatingCoolingState` method below
+        this.service.getCharacteristic(this.platform.Characteristic.CurrentTemperature)
+            .onGet(this.getCurrentTemperature.bind(this)); // GET - bind to the `getOn` method below
         this.service.getCharacteristic(this.platform.Characteristic.CoolingThresholdTemperature)
             .setProps({
             minValue: 16,
@@ -166,6 +168,7 @@ class AirConditionerAccessory {
             else {
                 this.platform.log.info(`${this.accessory.displayName} temperature is set to ${command} degrees.`);
                 this.acStates.temperature = command;
+                this.service.updateCharacteristic(this.platform.Characteristic.CurrentTemperature, command);
             }
         });
     }
@@ -184,6 +187,9 @@ class AirConditionerAccessory {
                 this.acStates.fan = command;
             }
         });
+    }
+    async getCurrentTemperature() {
+        return this.acStates.temperature;
     }
 }
 exports.AirConditionerAccessory = AirConditionerAccessory;

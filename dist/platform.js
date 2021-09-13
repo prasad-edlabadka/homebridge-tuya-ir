@@ -2,8 +2,8 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.TuyaIRPlatform = void 0;
 const TuyaIRDiscovery_1 = require("./lib/TuyaIRDiscovery");
-const AirConditionerAccessory_1 = require("./lib/AirConditionerAccessory");
-const FanAccessory_1 = require("./lib/FanAccessory");
+const AirConditionerAccessory_1 = require("./lib/accessories/AirConditionerAccessory");
+const FanAccessory_1 = require("./lib/accessories/FanAccessory");
 const PLATFORM_NAME = 'TuyaIR';
 const PLUGIN_NAME = 'homebridge-tuya-ir';
 const CLASS_DEF = {

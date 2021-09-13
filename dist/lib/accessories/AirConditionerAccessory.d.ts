@@ -1,5 +1,5 @@
 import { PlatformAccessory, CharacteristicValue } from 'homebridge';
-import { TuyaIRPlatform } from '../platform';
+import { TuyaIRPlatform } from '../../platform';
 /**
  * Air Conditioner Accessory
  * An instance of this class is created for each accessory your platform registers
@@ -59,5 +59,6 @@ export declare class AirConditionerAccessory {
     setCoolingThresholdTemperatureCharacteristic(value: CharacteristicValue): Promise<void>;
     getRotationSpeedCharacteristic(): Promise<CharacteristicValue>;
     setRotationSpeedCharacteristic(value: CharacteristicValue): Promise<void>;
+    getCurrentTemperature(): Promise<CharacteristicValue>;
 }
 //# sourceMappingURL=AirConditionerAccessory.d.ts.map

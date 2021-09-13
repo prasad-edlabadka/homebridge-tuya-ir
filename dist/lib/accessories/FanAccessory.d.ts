@@ -1,7 +1,7 @@
 import { PlatformAccessory, CharacteristicValue } from 'homebridge';
-import { TuyaIRPlatform } from '../platform';
+import { TuyaIRPlatform } from '../../platform';
 /**
- * Air Conditioner Accessory
+ * Fan Accessory
  * An instance of this class is created for each accessory your platform registers
  * Each accessory may expose multiple services of different service types.
  */

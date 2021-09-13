@@ -1,7 +1,7 @@
 import { Service, PlatformAccessory, CharacteristicValue } from 'homebridge';
-import { TuyaIRPlatform } from '../platform';
-import { Config } from './Config';
-import { TuyaAPIHelper } from './TuyaAPIHelper';
+import { TuyaIRPlatform } from '../../platform';
+import { Config } from '../Config';
+import { TuyaAPIHelper } from '../TuyaAPIHelper';
 
 /**
  * Air Conditioner Accessory
@@ -52,12 +52,15 @@ export class AirConditionerAccessory {
 
         // register handlers for the On/Off Characteristic
         this.service.getCharacteristic(this.platform.Characteristic.Active)
-            .onSet(this.setOn.bind(this))                // SET - bind to the `setOn` method below
-            .onGet(this.getOn.bind(this));               // GET - bind to the `getOn` method below
+            .onSet(this.setOn.bind(this))      // SET - bind to the `setOn` method below
+            .onGet(this.getOn.bind(this));     // GET - bind to the `getOn` method below
 
         this.service.getCharacteristic(this.platform.Characteristic.TargetHeatingCoolingState)
-            .onSet(this.setHeatingCoolingState.bind(this))                // SET - bind to the `setOn` method below
-            .onGet(this.getHeatingCoolingState.bind(this));               // GET - bind to the `getOn` method below
+            .onSet(this.setHeatingCoolingState.bind(this))                // SET - bind to the `setHeatingCoolingState` method below
+            .onGet(this.getHeatingCoolingState.bind(this));               // GET - bind to the `getHeatingCoolingState` method below
+
+        this.service.getCharacteristic(this.platform.Characteristic.CurrentTemperature)
+            .onGet(this.getCurrentTemperature.bind(this));               // GET - bind to the `getOn` method below
 
         this.service.getCharacteristic(this.platform.Characteristic.CoolingThresholdTemperature)
             .setProps({
@@ -123,15 +126,15 @@ export class AirConditionerAccessory {
      * Handle "SET" requests from HomeKit
      * These are sent when the user changes the state of an accessory, for example, turning on a Light bulb.
      */
-     async setHeatingCoolingState(value: CharacteristicValue) {
+    async setHeatingCoolingState(value: CharacteristicValue) {
         // implement your own code to turn your device on/off
         var val = value as number;
         var command;
         var modeName = "";
-        if(val == this.platform.Characteristic.TargetHeatingCoolingState.COOL) {
+        if (val == this.platform.Characteristic.TargetHeatingCoolingState.COOL) {
             command = 0;
             modeName = "Cool";
-        } else if(val == this.platform.Characteristic.TargetHeatingCoolingState.HEAT) {
+        } else if (val == this.platform.Characteristic.TargetHeatingCoolingState.HEAT) {
             command = 0;
             modeName = "Heat";
         } else {
@@ -187,6 +190,7 @@ export class AirConditionerAccessory {
             } else {
                 this.platform.log.info(`${this.accessory.displayName} temperature is set to ${command} degrees.`);
                 this.acStates.temperature = command;
+                this.service.updateCharacteristic(this.platform.Characteristic.CurrentTemperature, command);
             }
         });
     }
@@ -207,5 +211,9 @@ export class AirConditionerAccessory {
                 this.acStates.fan = command;
             }
         });
+    }
+
+    async getCurrentTemperature(): Promise<CharacteristicValue> {
+        return this.acStates.temperature;
     }
 }
