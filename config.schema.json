@@ -72,7 +72,7 @@
         "description": "Uncheck this box if your IR remotes are not discovered automatically. You will need to add your remote IDs manually below"
       },
       "devices": {
-        "title": "List of configured IR Blaster Rmeotes",
+        "title": "List of configured IR Blaster Remotes",
         "type": "array",
         "items": {
           "type": "object",
@@ -98,3 +98,4 @@
     }
   }
 }
+
