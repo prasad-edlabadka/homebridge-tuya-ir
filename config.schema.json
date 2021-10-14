@@ -58,11 +58,11 @@
         ]
       },
       "deviceId": {
-        "title": "IR Blaster Device ID",
+        "title": "Smart IR Device ID",
         "type": "string",
         "required": true,
         "default": "",
-        "description": "Device Id of IR Blaster"
+        "description": "Device Id of the Smart IR Device"
       },
       "autoFetchRemotes": {
         "title": "Fetch configured remotes automatically?",
@@ -72,7 +72,7 @@
         "description": "Uncheck this box if your IR remotes are not discovered automatically. You will need to add your remote IDs manually below"
       },
       "devices": {
-        "title": "List of configured IR Blaster Remotes",
+        "title": "List of configured Smart IR Remotes",
         "type": "array",
         "items": {
           "type": "object",
@@ -81,7 +81,7 @@
             "id": {
               "title": "Remote Id",
               "type": "string",
-              "description": "IR Blaster Device ID",
+              "description": "Remote ID",
               "required": true
             },
             "diy": {

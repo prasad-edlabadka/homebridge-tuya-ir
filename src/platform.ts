@@ -2,13 +2,14 @@ import { API, DynamicPlatformPlugin, Logger, PlatformAccessory, PlatformConfig, 
 import { TuyaIRDiscovery } from './lib/TuyaIRDiscovery';
 import { AirConditionerAccessory } from './lib/accessories/AirConditionerAccessory';
 import { FanAccessory } from './lib/accessories/FanAccessory';
+import { GenericAccessory } from './lib/accessories/GenericAccessory';
 
 const PLATFORM_NAME = 'TuyaIR';
 const PLUGIN_NAME = 'homebridge-tuya-ir';
 const CLASS_DEF = {
   infrared_ac: AirConditionerAccessory,
   infrared_fan: FanAccessory
-};
+}; 
 /**
  * HomebridgePlatform
  * This class is the main constructor for your plugin, this is where you should
@@ -80,7 +81,7 @@ export class TuyaIRPlatform implements DynamicPlatformPlugin {
           // something globally unique, but constant, for example, the device serial
           // number or MAC address
           device.ir_id = this.config.deviceId;
-          const Accessory = CLASS_DEF[device.category];
+          const Accessory = CLASS_DEF[device.category] || GenericAccessory;
           const uuid = this.api.hap.uuid.generate(device.id);
 
           // see if an accessory with the same uuid has already been registered and restored from

@@ -16,11 +16,12 @@
 ![GitHub last commit](https://img.shields.io/github/last-commit/prasad-edlabadka/homebridge-tuya-ir)
 
 
-Control your Tuya IR Blaster baed devices in HomeKit. Also works with Smart Home IR Blaster.
+Control your Tuya Smart IR based devices in HomeKit. Also works with Smart Home IR Blaster.
 
 ## Supported Devices
 * Air Conditioner (Only pre-configured vendor. No DIY devices)
 * Fan (Pre-configured and DIY devices)
+* All other Pre-configured remotes will be added as switch to turn them on and off only. No other feature. (No DIY devices)
 
 ## Installation Instructions
 
@@ -59,7 +60,7 @@ Repeat the steps for all the highligted services in the following image
 
 ## Known Issues
 
-1. Tuya API doesn't always return devices added to IR blaster based on OEM hardware. Thus, you need to add them in your app and then provide IDs in the plugin configuration. This is configuruable in the configuration.
+1. Tuya API doesn't always return devices added to Smart IR based on OEM hardware. Thus, you need to add them in your app and then provide IDs in the plugin configuration. This is configuruable in the configuration.
 
 ## Contributing
 

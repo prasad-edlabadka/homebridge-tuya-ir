@@ -4,6 +4,7 @@ exports.TuyaIRPlatform = void 0;
 const TuyaIRDiscovery_1 = require("./lib/TuyaIRDiscovery");
 const AirConditionerAccessory_1 = require("./lib/accessories/AirConditionerAccessory");
 const FanAccessory_1 = require("./lib/accessories/FanAccessory");
+const GenericAccessory_1 = require("./lib/accessories/GenericAccessory");
 const PLATFORM_NAME = 'TuyaIR';
 const PLUGIN_NAME = 'homebridge-tuya-ir';
 const CLASS_DEF = {
@@ -73,7 +74,7 @@ class TuyaIRPlatform {
                     // something globally unique, but constant, for example, the device serial
                     // number or MAC address
                     device.ir_id = this.config.deviceId;
-                    const Accessory = CLASS_DEF[device.category];
+                    const Accessory = CLASS_DEF[device.category] || GenericAccessory_1.GenericAccessory;
                     const uuid = this.api.hap.uuid.generate(device.id);
                     // see if an accessory with the same uuid has already been registered and restored from
                     // the cached devices we stored in the `configureAccessory` method above
