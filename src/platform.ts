@@ -9,7 +9,7 @@ const PLUGIN_NAME = 'homebridge-tuya-ir';
 const CLASS_DEF = {
   infrared_ac: AirConditionerAccessory,
   infrared_fan: FanAccessory
-}; 
+};
 /**
  * HomebridgePlatform
  * This class is the main constructor for your plugin, this is where you should
@@ -62,15 +62,19 @@ export class TuyaIRPlatform implements DynamicPlatformPlugin {
   discoverDevices() {
 
     const devices = {};
-    if (!this.config.devices) return this.log.error("No devices configured. Please configure atleast one device.");
+    //if (!this.config.devices) return this.log.error("No devices configured. Please configure atleast one device.");
     if (!this.config.client_id) return this.log.error("Client ID is not configured. Please check your config.json");
     if (!this.config.secret) return this.log.error("Client Secret is not configured. Please check your config.json");
     if (!this.config.region) return this.log.error("Region is not configured. Please check your config.json");
-    if (!this.config.deviceId) return this.log.error("IR Blaster device ID is not configured. Please check your config.json");
+    //if (!this.config.deviceId) return this.log.error("IR Blaster device ID is not configured. Please check your config.json");
 
     this.log.info('Starting discovery...');
     var tuya: TuyaIRDiscovery = new TuyaIRDiscovery(this.log, this.api);
-    tuya.start(this.api, this.config, (devices) => {
+    this.discover(tuya, 0, this.config.smartIR.length);
+  }
+
+  discover(tuya, i, total) {
+    tuya.start(this.api, this.config, i, (devices, index) => {
 
       this.log.debug(JSON.stringify(devices));
       //loop over the discovered devices and register each one if it has not already been registered
@@ -80,7 +84,7 @@ export class TuyaIRPlatform implements DynamicPlatformPlugin {
           // generate a unique id for the accessory this should be generated from
           // something globally unique, but constant, for example, the device serial
           // number or MAC address
-          device.ir_id = this.config.deviceId;
+          device.ir_id = this.config.smartIR[index].deviceId;
           const Accessory = CLASS_DEF[device.category] || GenericAccessory;
           const uuid = this.api.hap.uuid.generate(device.id);
 
@@ -134,9 +138,10 @@ export class TuyaIRPlatform implements DynamicPlatformPlugin {
           }
         }
       }
+      i++;
+      if(i < total) {
+        this.discover(tuya, i, total);
+      }
     });
-
   }
-
-
 }

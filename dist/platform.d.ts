@@ -24,5 +24,6 @@ export declare class TuyaIRPlatform implements DynamicPlatformPlugin {
      * must not be registered again to prevent "duplicate UUID" errors.
      */
     discoverDevices(): void;
+    discover(tuya: any, i: any, total: any): void;
 }
 //# sourceMappingURL=platform.d.ts.map

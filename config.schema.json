@@ -57,45 +57,54 @@
           }
         ]
       },
-      "deviceId": {
-        "title": "Smart IR Device ID",
-        "type": "string",
-        "required": true,
-        "default": "",
-        "description": "Device Id of the Smart IR Device"
-      },
-      "autoFetchRemotes": {
-        "title": "Fetch configured remotes automatically?",
-        "type": "boolean",
-        "required": true,
-        "default": true,
-        "description": "Uncheck this box if your IR remotes are not discovered automatically. You will need to add your remote IDs manually below"
-      },
-      "devices": {
-        "title": "List of configured Smart IR Remotes",
+      "smartIR": {
+        "title": "List of Smart IR Devices",
         "type": "array",
         "items": {
           "type": "object",
-          "title": "Remote Details",
+          "title": "Smart IR Details",
           "properties": {
-            "id": {
-              "title": "Remote Id",
+            "deviceId": {
+              "title": "Smart IR Device ID",
               "type": "string",
-              "description": "Remote ID",
-              "required": true
+              "required": true,
+              "default": "",
+              "description": "Device Id of the Smart IR Device"
             },
-            "diy": {
-              "title": "Is this Remote DIY?",
+            "autoFetchRemotes": {
+              "title": "Fetch configured remotes automatically?",
               "type": "boolean",
-              "required": true
+              "required": true,
+              "default": true,
+              "description": "Uncheck this box if your IR remotes are not discovered automatically. You will need to add your remote IDs manually below"
+            },
+            "devices": {
+              "title": "List of configured Smart IR Remotes",
+              "type": "array",
+              "items": {
+                "type": "object",
+                "title": "Remote Details",
+                "properties": {
+                  "id": {
+                    "title": "Remote Id",
+                    "type": "string",
+                    "description": "Remote ID",
+                    "required": true
+                  },
+                  "diy": {
+                    "title": "Is this Remote DIY?",
+                    "type": "boolean",
+                    "required": true
+                  }
+                }
+              },
+              "condition": {
+                "functionBody": "return model.smartIR[arrayIndices].autoFetchRemotes === false;"
+              }
             }
           }
-        },
-        "condition": {
-          "functionBody": "return model.autoFetchRemotes === false;"
         }
       }
     }
   }
 }
-

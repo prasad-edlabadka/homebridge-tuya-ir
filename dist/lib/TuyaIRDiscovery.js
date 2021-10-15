@@ -11,14 +11,14 @@ class TuyaIRDiscovery extends EventEmitter {
         this.log = log;
         this.api = api;
     }
-    start(api, props, cb) {
+    start(api, props, index, cb) {
         this.log.info(`Trying to login...`);
-        this.config = new Config_1.Config(props.client_id, props.secret, props.region, props.deviceId, props.autoFetchRemotes, props.devices);
+        this.config = new Config_1.Config(props.client_id, props.secret, props.region, props.smartIR[index].deviceId, props.smartIR[index].autoFetchRemotes, props.smartIR[index].devices);
         var helper = TuyaAPIHelper_1.TuyaAPIHelper.Instance(this.config, this.log);
         helper.login(() => {
             this.log.info("Fetching configured remotes...");
             helper.fetchDevices(this.config.deviceId, (devs) => {
-                cb(devs);
+                cb(devs, index);
             });
         });
     }

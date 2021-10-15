@@ -26,7 +26,10 @@ export class TuyaAPIHelper {
     private static _instance: TuyaAPIHelper;
 
     public static Instance(config: Config, log: Logger) {
-        return this._instance || (this._instance = new this(config, log));
+        var c = this._instance || (this._instance = new this(config, log));
+        c.config = config;
+        c.log = log;
+        return c;
     }
 
     login(cb) {
@@ -189,8 +192,9 @@ export class TuyaAPIHelper {
                     body = JSON.parse(_body);
                     this.log.debug(`Found category id: ${body.result.category_id}, brand id: ${body.result.brand_id}, remote id: ${body.result.remote_index}`)
                     this._apiCall(this.apiHost + `/v1.0/infrareds/${deviceId}/categories/${body.result.category_id}/brands/${body.result.brand_id}/remotes/${body.result.remote_index}/rules`, "GET", {}, (_body2, err2) => {
-                        if (!err2) {
-                            let body2 = JSON.parse(_body2);
+                        let body2 = JSON.parse(_body2);
+                        if (!err2 && body2.success) {
+                            //let body2 = JSON.parse(_body2);
                             let ret = { power: "", speed: "", swing: "" };
                             for (var i = 0; i < body2.result.length; i++) {
                                 let k = body2.result[i];
@@ -204,7 +208,7 @@ export class TuyaAPIHelper {
                             }
                             cb(ret);
                         } else {
-                            this.log.error("Failed to invoke API", err2);
+                            this.log.error("Failed to invoke API", err2 || body2.msg);
                             cb();
                         }
                     });
