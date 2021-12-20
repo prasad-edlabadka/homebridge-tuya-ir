@@ -24,8 +24,12 @@ export class Config {
 export class Device {
     public id: string = "";
     public diy: boolean = false;
+    public model: string = "Unknown";
+    public brand: string = "Unknown";
     constructor(dev) {
-        this.id = dev.id;
-        this.diy = dev.diy;
+        this.id    = dev.id;
+        this.diy   = dev.diy;
+        this.model = dev.model;
+        this.brand = dev.brand;
     }
 }

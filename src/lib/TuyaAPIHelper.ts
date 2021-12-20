@@ -109,7 +109,9 @@ export class TuyaAPIHelper {
                         this.log.error(`Server returned error: '${bd.msg}'`)
                         devs.push({});
                     } else {
-                        bd.result.diy = dev.diy;
+                        bd.result.diy   = dev.diy;
+                        bd.result.model = dev.model;
+                        bd.result.brand = dev.brand;
                         devs.push(bd.result);
                     }
                 }
@@ -127,6 +129,17 @@ export class TuyaAPIHelper {
         }
         this.log.debug(JSON.stringify(commandObj));
         this._apiCall(this.apiHost + `/v1.0/infrareds/${deviceId}/air-conditioners/${remoteId}/command`, "POST", commandObj, (_body, err) => {
+            var body = { success: false, msg: "Failed to invoke API" };
+            if (!err) {
+                body = JSON.parse(_body);
+            }
+            cb(body);
+        })
+    }
+    
+    getACStatus(deviceId: string, remoteId: string, cb) {
+        this.log.debug("Getting AC Status");
+        this._apiCall(this.apiHost + `/v2.0/infrareds/${deviceId}/remotes/${remoteId}/ac/status`, "GET", {}, (_body, err) => {
             var body = { success: false, msg: "Failed to invoke API" };
             if (!err) {
                 body = JSON.parse(_body);
