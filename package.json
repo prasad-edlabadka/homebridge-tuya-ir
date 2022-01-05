@@ -7,10 +7,10 @@
   "license": "Apache-2.0",
   "repository": {
     "type": "git",
-    "url": "git://github.com/donkeystudio/homebridge-tuya-ir.git"
+    "url": "git://github.com/prasad-edlabadka/homebridge-tuya-ir.git"
   },
   "bugs": {
-    "url": "https://github.com/donkeystudio/homebridge-tuya-ir/issues"
+    "url": "https://github.com/prasad-edlabadka/homebridge-tuya-ir/issues"
   },
   "engines": {
     "node": ">=10.17.0",
