@@ -95,6 +95,20 @@
                     "title": "Is this Remote DIY?",
                     "type": "boolean",
                     "required": true
+                  },
+                  "model": {
+                    "title": "Model",
+                    "type": "string",
+                    "required": false,
+                    "default": "Unknown",
+                    "description": "Model of the Remote"
+                  },
+                  "brand": {
+                    "title": "Brand",
+                    "type": "string",
+                    "required": false,
+                    "default": "Unknown",
+                    "description": "Brand of the Remote"
                   }
                 }
               },
