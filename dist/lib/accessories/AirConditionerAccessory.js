@@ -116,7 +116,7 @@ class AirConditionerAccessory {
             modeName = "Cool";
         }
         else if (val == this.platform.Characteristic.TargetHeatingCoolingState.HEAT) {
-            command = 0;
+            command = 1;
             modeName = "Heat";
         }
         else {
