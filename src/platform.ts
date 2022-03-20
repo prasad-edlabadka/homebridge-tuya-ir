@@ -21,6 +21,7 @@ export class TuyaIRPlatform implements DynamicPlatformPlugin {
 
   // this is used to track restored cached accessories
   public readonly accessories: PlatformAccessory[] = [];
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   public cachedAccessories: Map<any, any> = new Map();
 
 
@@ -61,7 +62,6 @@ export class TuyaIRPlatform implements DynamicPlatformPlugin {
    */
   discoverDevices() {
 
-    const devices = {};
     //if (!this.config.devices) return this.log.error("No devices configured. Please configure atleast one device.");
     if (!this.config.client_id) return this.log.error("Client ID is not configured. Please check your config.json");
     if (!this.config.secret) return this.log.error("Client Secret is not configured. Please check your config.json");
@@ -69,7 +69,7 @@ export class TuyaIRPlatform implements DynamicPlatformPlugin {
     //if (!this.config.deviceId) return this.log.error("IR Blaster device ID is not configured. Please check your config.json");
 
     this.log.info('Starting discovery...');
-    var tuya: TuyaIRDiscovery = new TuyaIRDiscovery(this.log, this.api);
+    const tuya: TuyaIRDiscovery = new TuyaIRDiscovery(this.log, this.api);
     this.discover(tuya, 0, this.config.smartIR.length);
   }
 
@@ -78,7 +78,7 @@ export class TuyaIRPlatform implements DynamicPlatformPlugin {
 
       this.log.debug(JSON.stringify(devices));
       //loop over the discovered devices and register each one if it has not already been registered
-      for (var device of devices) {
+      for (const device of devices) {
         if (device) {
 
           // generate a unique id for the accessory this should be generated from
