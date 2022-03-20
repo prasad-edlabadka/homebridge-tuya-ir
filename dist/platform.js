@@ -25,6 +25,7 @@ class TuyaIRPlatform {
         this.Characteristic = this.api.hap.Characteristic;
         // this is used to track restored cached accessories
         this.accessories = [];
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         this.cachedAccessories = new Map();
         this.log.debug('Finished initializing platform:', this.config.name);
         // When this event is fired it means Homebridge has restored all cached accessories from disk.
@@ -52,7 +53,6 @@ class TuyaIRPlatform {
      * must not be registered again to prevent "duplicate UUID" errors.
      */
     discoverDevices() {
-        const devices = {};
         //if (!this.config.devices) return this.log.error("No devices configured. Please configure atleast one device.");
         if (!this.config.client_id)
             return this.log.error("Client ID is not configured. Please check your config.json");
@@ -62,14 +62,14 @@ class TuyaIRPlatform {
             return this.log.error("Region is not configured. Please check your config.json");
         //if (!this.config.deviceId) return this.log.error("IR Blaster device ID is not configured. Please check your config.json");
         this.log.info('Starting discovery...');
-        var tuya = new TuyaIRDiscovery_1.TuyaIRDiscovery(this.log, this.api);
+        const tuya = new TuyaIRDiscovery_1.TuyaIRDiscovery(this.log, this.api);
         this.discover(tuya, 0, this.config.smartIR.length);
     }
     discover(tuya, i, total) {
         tuya.start(this.api, this.config, i, (devices, index) => {
             this.log.debug(JSON.stringify(devices));
             //loop over the discovered devices and register each one if it has not already been registered
-            for (var device of devices) {
+            for (const device of devices) {
                 if (device) {
                     // generate a unique id for the accessory this should be generated from
                     // something globally unique, but constant, for example, the device serial

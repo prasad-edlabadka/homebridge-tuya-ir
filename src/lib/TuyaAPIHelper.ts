@@ -1,9 +1,9 @@
 import { Logger } from "homebridge";
 import { Config } from "./Config";
 
-const CryptoJS = require('crypto-js');
-const request = require('request');
-const URL = require('url');
+import CryptoJS from 'crypto-js';
+import request from 'request';
+import URL from 'url';
 
 export class TuyaAPIHelper {
     private constructor(config: Config, log: Logger) {
@@ -14,19 +14,19 @@ export class TuyaAPIHelper {
         this.config = config;
     }
 
-    private accessToken: string = "";
-    private refreshToken: string = "";
-    private clientId: string = "";
-    private clientSecret: string = "";
-    private apiHost: string = "";
+    private accessToken = "";
+    private refreshToken = "";
+    private clientId = "";
+    private clientSecret = "";
+    private apiHost = "";
     private timestamp: number = new Date().getTime();
-    private signKey: string = "";
+    private signKey = "";
     private log: Logger;
     private config: Config;
     private static _instance: TuyaAPIHelper;
 
     public static Instance(config: Config, log: Logger) {
-        var c = this._instance || (this._instance = new this(config, log));
+        const c = this._instance || (this._instance = new this(config, log));
         c.config = config;
         c.log = log;
         return c;
@@ -35,7 +35,7 @@ export class TuyaAPIHelper {
     login(cb) {
         this.log.info(`Logging in to the the server ${this.apiHost}...`);
         this._loginApiCall(this.apiHost + "/v1.0/token?grant_type=1", {}, (_body) => {
-            var body = { msg: "Error" };
+            let body;
             try {
                 body = JSON.parse(_body);
             } catch (error) {
@@ -70,8 +70,8 @@ export class TuyaAPIHelper {
                     this.log.error("Failed to get remotes device: " + deviceId);
                     cb([]);
                 } else {
-                    var devs: any[] = [];
-                    var body = { msg: "Error" };
+                    const devs: unknown[] = [];
+                    let body;
                     try {
                         body = JSON.parse(_body);
                     } catch (error) {
@@ -86,14 +86,14 @@ export class TuyaAPIHelper {
                         this._manualFetch(cb);
                     } else {
                         this.log.warn(`API returned ${body.result.length} remotes...`);
-                        for (var i = 0; i < body.result.length; i++) {
+                        for (let i = 0; i < body.result.length; i++) {
                             this._apiCall(this.apiHost + `/v1.0/devices/${body.result[i].remote_id}`, "GET", {}, (_b, err) => {
                                 if (err) {
                                     this.log.error("Failed to get remote configuration for: " + body.result[i].remote_id);
                                     devs.push({});
                                 } else {
                                     this.log.debug(_b)
-                                    var _body = { msg: "Error" };
+                                    let _body;
                                     try {
                                         _body = JSON.parse(_b);
                                         devs.push(_body.result);
@@ -115,9 +115,9 @@ export class TuyaAPIHelper {
     }
 
     _manualFetch(cb) {
-        var devs: any[] = [];
-        for (var i = 0; i < this.config.devices.length; i++) {
-            var dev = this.config.devices[i];
+        const devs: unknown[] = [];
+        for (let i = 0; i < this.config.devices.length; i++) {
+            const dev = this.config.devices[i];
             this._apiCall(this.apiHost + `/v1.0/devices/${dev.id}`, "GET", {}, (_b, err) => {
 
                 if (err) {
@@ -125,7 +125,7 @@ export class TuyaAPIHelper {
                     devs.push({});
                 } else {
                     this.log.debug(_b);
-                    let bd = { msg: "Error" };
+                    let bd;
                     try {
                         bd = JSON.parse(_b);
                     } catch (error) {
@@ -153,13 +153,13 @@ export class TuyaAPIHelper {
     }
 
     sendACCommand(deviceId: string, remoteId: string, command: string, value: string | number, cb) {
-        let commandObj = {
+        const commandObj = {
             "code": command,
             "value": value
         }
         this.log.debug(JSON.stringify(commandObj));
         this._apiCall(this.apiHost + `/v1.0/infrareds/${deviceId}/air-conditioners/${remoteId}/command`, "POST", commandObj, (_body, err) => {
-            var body = { success: false, msg: "Failed to invoke API" };
+            let body = { success: false, msg: "Failed to invoke API" };
             if (!err) {
                 try {
                     body = JSON.parse(_body);
@@ -174,7 +174,7 @@ export class TuyaAPIHelper {
     getACStatus(deviceId: string, remoteId: string, cb) {
         this.log.debug("Getting AC Status");
         this._apiCall(this.apiHost + `/v2.0/infrareds/${deviceId}/remotes/${remoteId}/ac/status`, "GET", {}, (_body, err) => {
-            var body = { success: false, msg: "Failed to invoke API" };
+            let body = { success: false, msg: "Failed to invoke API" };
             if (!err) {
                 try {
                     body = JSON.parse(_body);
@@ -186,18 +186,18 @@ export class TuyaAPIHelper {
         })
     }
 
-    sendFanCommand(deviceId: string, remoteId: string, command: string | number, diy: boolean = false, cb) {
-        var commandObj = diy ? {
+    sendFanCommand(deviceId: string, remoteId: string, command: string | number, diy = false, cb) {
+        const commandObj = diy ? {
             "code": command
         } : {
             "raw_key": command
         };
 
-        var url = diy ? `${this.apiHost}/v1.0/infrareds/${deviceId}/remotes/${remoteId}/learning-codes` : `${this.apiHost}/v1.0/infrareds/${deviceId}/remotes/${remoteId}/raw/command`;
+        const url = diy ? `${this.apiHost}/v1.0/infrareds/${deviceId}/remotes/${remoteId}/learning-codes` : `${this.apiHost}/v1.0/infrareds/${deviceId}/remotes/${remoteId}/raw/command`;
 
         this.log.debug(JSON.stringify(commandObj));
         this._apiCall(url, "POST", commandObj, (_body, err) => {
-            var body = { success: false, msg: "Failed to invoke API" };
+            let body = { success: false, msg: "Failed to invoke API" };
             if (!err) {
                 try {
                     body = JSON.parse(_body);
@@ -209,12 +209,12 @@ export class TuyaAPIHelper {
         })
     }
 
-    getFanCommands(deviceId: string, remoteId: string, diy: boolean = false, cb) {
+    getFanCommands(deviceId: string, remoteId: string, diy = false, cb) {
         this.log.debug("Getting commands for Fan...");
         if (diy) {
             this.log.debug("Getting commands for DIY Fan...");
             this._apiCall(this.apiHost + `/v1.0/infrareds/${deviceId}/remotes/${remoteId}/learning-codes`, "GET", {}, (_body, err) => {
-                var body;
+                let body;
                 if (!err) {
                     try {
                         body = JSON.parse(_body);
@@ -222,9 +222,9 @@ export class TuyaAPIHelper {
                         this.log.error("Unable to parse message body" + error);
                     }
                     if (body.success) {
-                        let ret = { power: "", speed: "", swing: "" };
-                        for (var i = 0; i < body.result.length; i++) {
-                            let k = body.result[i];
+                        const ret = { power: "", speed: "", swing: "" };
+                        for (let i = 0; i < body.result.length; i++) {
+                            const k = body.result[i];
                             if (k.key_name == 'power') {
                                 ret.power = k.code;
                             } else if (k.key_name == 'fan_speed') {
@@ -246,7 +246,7 @@ export class TuyaAPIHelper {
         } else {
             this.log.debug("First getting brand id and remote id for given device...");
             this._apiCall(this.apiHost + `/v1.0/infrareds/${deviceId}/remotes/${remoteId}/keys`, "GET", {}, (_body, err) => {
-                var body;
+                let body;
                 if (!err) {
                     try {
                         body = JSON.parse(_body);
@@ -265,9 +265,9 @@ export class TuyaAPIHelper {
                         }
                         if (!err2 && body2.success) {
                             //let body2 = JSON.parse(_body2);
-                            let ret = { power: "", speed: "", swing: "" };
-                            for (var i = 0; i < body2.result.length; i++) {
-                                let k = body2.result[i];
+                            const ret = { power: "", speed: "", swing: "" };
+                            for (let i = 0; i < body2.result.length; i++) {
+                                const k = body2.result[i];
                                 if (k.key_name == 'power') {
                                     ret.power = k.key;
                                 } else if (k.key_name == 'fan_speed') {
@@ -292,9 +292,10 @@ export class TuyaAPIHelper {
 
     _refreshToken() {
         this.log.info("Need to refresh token now...");
-        var _this = this;
+        // eslint-disable-next-line @typescript-eslint/no-this-alias
+        const _this = this;
         this._loginApiCall(this.apiHost + "/v1.0/token/" + this.refreshToken, {}, (_body) => {
-            var body;
+            let body;
             try {
                 body = JSON.parse(_body);
             } catch (error) {
@@ -309,25 +310,27 @@ export class TuyaAPIHelper {
                 }, (body.result.expire_time - 5) * 1000);
             } else {
                 _this.log.error(`Unable to refresh token: ${body.msg}. Trying fresh login...`);
+                // eslint-disable-next-line @typescript-eslint/no-empty-function
                 this.login(() => { });
             }
         });
     }
 
-    _calculateSign(withAccessToken: boolean, query: string, url: string, httpMethod: string, body: string = "") {
+    _calculateSign(withAccessToken: boolean, query: string, url: string, httpMethod: string, body = "") {
         this.timestamp = new Date().getTime();
-        var signMap = this._stringToSign(query, url, httpMethod, body)
-        var signStr = signMap["signUrl"]
-        var str = withAccessToken ? this.clientId + this.accessToken + this.timestamp + signStr : this.clientId + this.timestamp + signStr;
+        const signMap = this._stringToSign(query, url, httpMethod, body)
+        const signStr = signMap["signUrl"]
+        const str = withAccessToken ? this.clientId + this.accessToken + this.timestamp + signStr : this.clientId + this.timestamp + signStr;
         this.signKey = CryptoJS.HmacSHA256(str, this.clientSecret).toString().toUpperCase();
     }
 
     _loginApiCall(endpoint: string, body: object, cb) {
-        var _this = this;
-        let url = URL.parse(endpoint, true);
+        // eslint-disable-next-line @typescript-eslint/no-this-alias
+        const _this = this;
+        const url = URL.parse(endpoint, true);
 
-        this._calculateSign(false, url.query, url.pathname, 'GET');
-        var options = {
+        this._calculateSign(false, "" + url.query, "" + url.pathname, 'GET');
+        const options = {
             url: endpoint,
             headers: {
                 'client_id': this.clientId,
@@ -349,10 +352,11 @@ export class TuyaAPIHelper {
     }
     _apiCall(endpoint: string, method: string, body: object, cb) {
         this.log.debug(`Calling endpoint ${endpoint}`);
-        var _this = this;
-        let url = URL.parse(endpoint, true);
-        this._calculateSign(true, url.query, url.pathname, method, JSON.stringify(body));
-        var options = {
+        // eslint-disable-next-line @typescript-eslint/no-this-alias
+        const _this = this;
+        const url = URL.parse(endpoint, true);
+        this._calculateSign(true, "" + url.query, "" + url.pathname, method, JSON.stringify(body));
+        const options = {
             method: method,
             url: endpoint,
             headers: {
@@ -379,11 +383,11 @@ export class TuyaAPIHelper {
 
     // Generate signature string
     _stringToSign(query, url, method, body) {
-        var sha256 = "";
-        var headersStr = "";
-        var map = {};
-        var arr = [];
-        var bodyStr = body || "";
+        let sha256 = "";
+        const headersStr = "";
+        const map = {};
+        let arr = [];
+        const bodyStr = body || "";
         if (query) {
             this.toJsonObj(query, arr, map);
         }
@@ -403,9 +407,9 @@ export class TuyaAPIHelper {
     }
 
     toJsonObj(params, arr, map) {
-        var jsonBodyStr = JSON.stringify(params);
-        var jsonBody = JSON.parse(jsonBodyStr);
-        for (var key in jsonBody) {
+        const jsonBodyStr = JSON.stringify(params);
+        const jsonBody = JSON.parse(jsonBodyStr);
+        for (const key in jsonBody) {
             arr.push(key);
             map[key] = jsonBody[key];
         }

@@ -18,6 +18,10 @@ export declare class AirConditionerAccessory {
     private tuya;
     constructor(platform: TuyaIRPlatform, accessory: PlatformAccessory);
     /**
+    * Load latest device status.
+    */
+    refreshStatus(): Promise<void>;
+    /**
      * Handle "SET" requests from HomeKit
      * These are sent when the user changes the state of an accessory, for example, turning on a Light bulb.
      */

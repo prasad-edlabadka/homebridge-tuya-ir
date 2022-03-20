@@ -17,6 +17,7 @@ export declare class TuyaAPIHelper {
     fetchDevices(deviceId: string, cb: any): void;
     _manualFetch(cb: any): void;
     sendACCommand(deviceId: string, remoteId: string, command: string, value: string | number, cb: any): void;
+    getACStatus(deviceId: string, remoteId: string, cb: any): void;
     sendFanCommand(deviceId: string, remoteId: string, command: string | number, diy: boolean | undefined, cb: any): void;
     getFanCommands(deviceId: string, remoteId: string, diy: boolean | undefined, cb: any): void;
     _refreshToken(): void;

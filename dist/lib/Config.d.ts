@@ -10,6 +10,8 @@ export declare class Config {
 export declare class Device {
     id: string;
     diy: boolean;
+    model: string;
+    brand: string;
     constructor(dev: any);
 }
 //# sourceMappingURL=Config.d.ts.map

@@ -28,7 +28,13 @@ class TuyaAPIHelper {
     login(cb) {
         this.log.info(`Logging in to the the server ${this.apiHost}...`);
         this._loginApiCall(this.apiHost + "/v1.0/token?grant_type=1", {}, (_body) => {
-            var body = JSON.parse(_body);
+            var body = { msg: "Error" };
+            try {
+                body = JSON.parse(_body);
+            }
+            catch (error) {
+                body = { msg: "Unable to parse body." };
+            }
             if (body.success) {
                 this.log.info(`Login successful.`);
                 this.accessToken = body.result.access_token;
@@ -59,8 +65,17 @@ class TuyaAPIHelper {
                     cb([]);
                 }
                 else {
-                    var body = JSON.parse(_body);
                     var devs = [];
+                    var body = { msg: "Error" };
+                    try {
+                        body = JSON.parse(_body);
+                    }
+                    catch (error) {
+                        this.log.error("Unable to parse message body" + error);
+                        devs.push({});
+                        cb(devs);
+                        return;
+                    }
                     if (!body.result) {
                         this.log.warn("API didn't return any devices Using hardcoded devices...");
                         this._manualFetch(cb);
@@ -75,7 +90,15 @@ class TuyaAPIHelper {
                                 }
                                 else {
                                     this.log.debug(_b);
-                                    devs.push(JSON.parse(_b).result);
+                                    var _body = { msg: "Error" };
+                                    try {
+                                        _body = JSON.parse(_b);
+                                        devs.push(_body.result);
+                                    }
+                                    catch (error) {
+                                        this.log.error("Unable to parse message body" + error);
+                                        devs.push({});
+                                    }
                                 }
                                 if (devs.length == body.result.length) {
                                     cb(devs);
@@ -98,7 +121,16 @@ class TuyaAPIHelper {
                 }
                 else {
                     this.log.debug(_b);
-                    let bd = JSON.parse(_b);
+                    let bd = { msg: "Error" };
+                    try {
+                        bd = JSON.parse(_b);
+                    }
+                    catch (error) {
+                        this.log.error("Unable to parse message body" + error);
+                        devs.push({});
+                        cb(devs);
+                        return;
+                    }
                     if (!bd.success) {
                         this.log.error("Failed to get remote configuration for: " + dev.id);
                         this.log.error(`Server returned error: '${bd.msg}'`);
@@ -106,6 +138,8 @@ class TuyaAPIHelper {
                     }
                     else {
                         bd.result.diy = dev.diy;
+                        bd.result.model = dev.model;
+                        bd.result.brand = dev.brand;
                         devs.push(bd.result);
                     }
                 }
@@ -124,7 +158,27 @@ class TuyaAPIHelper {
         this._apiCall(this.apiHost + `/v1.0/infrareds/${deviceId}/air-conditioners/${remoteId}/command`, "POST", commandObj, (_body, err) => {
             var body = { success: false, msg: "Failed to invoke API" };
             if (!err) {
-                body = JSON.parse(_body);
+                try {
+                    body = JSON.parse(_body);
+                }
+                catch (error) {
+                    this.log.error("Unable to parse message body" + error);
+                }
+            }
+            cb(body);
+        });
+    }
+    getACStatus(deviceId, remoteId, cb) {
+        this.log.debug("Getting AC Status");
+        this._apiCall(this.apiHost + `/v2.0/infrareds/${deviceId}/remotes/${remoteId}/ac/status`, "GET", {}, (_body, err) => {
+            var body = { success: false, msg: "Failed to invoke API" };
+            if (!err) {
+                try {
+                    body = JSON.parse(_body);
+                }
+                catch (error) {
+                    this.log.error("Unable to parse message body" + error);
+                }
             }
             cb(body);
         });
@@ -140,7 +194,12 @@ class TuyaAPIHelper {
         this._apiCall(url, "POST", commandObj, (_body, err) => {
             var body = { success: false, msg: "Failed to invoke API" };
             if (!err) {
-                body = JSON.parse(_body);
+                try {
+                    body = JSON.parse(_body);
+                }
+                catch (error) {
+                    this.log.error("Unable to parse message body" + error);
+                }
             }
             cb(body);
         });
@@ -152,7 +211,12 @@ class TuyaAPIHelper {
             this._apiCall(this.apiHost + `/v1.0/infrareds/${deviceId}/remotes/${remoteId}/learning-codes`, "GET", {}, (_body, err) => {
                 var body;
                 if (!err) {
-                    body = JSON.parse(_body);
+                    try {
+                        body = JSON.parse(_body);
+                    }
+                    catch (error) {
+                        this.log.error("Unable to parse message body" + error);
+                    }
                     if (body.success) {
                         let ret = { power: "", speed: "", swing: "" };
                         for (var i = 0; i < body.result.length; i++) {
@@ -185,10 +249,23 @@ class TuyaAPIHelper {
             this._apiCall(this.apiHost + `/v1.0/infrareds/${deviceId}/remotes/${remoteId}/keys`, "GET", {}, (_body, err) => {
                 var body;
                 if (!err) {
-                    body = JSON.parse(_body);
+                    try {
+                        body = JSON.parse(_body);
+                    }
+                    catch (error) {
+                        this.log.error("Unable to parse message body" + error);
+                        cb();
+                        return;
+                    }
                     this.log.debug(`Found category id: ${body.result.category_id}, brand id: ${body.result.brand_id}, remote id: ${body.result.remote_index}`);
                     this._apiCall(this.apiHost + `/v1.0/infrareds/${deviceId}/categories/${body.result.category_id}/brands/${body.result.brand_id}/remotes/${body.result.remote_index}/rules`, "GET", {}, (_body2, err2) => {
-                        let body2 = JSON.parse(_body2);
+                        let body2;
+                        try {
+                            body2 = JSON.parse(_body2);
+                        }
+                        catch (error) {
+                            this.log.error("Unable to parse message body" + error);
+                        }
                         if (!err2 && body2.success) {
                             //let body2 = JSON.parse(_body2);
                             let ret = { power: "", speed: "", swing: "" };
@@ -223,7 +300,13 @@ class TuyaAPIHelper {
         this.log.info("Need to refresh token now...");
         var _this = this;
         this._loginApiCall(this.apiHost + "/v1.0/token/" + this.refreshToken, {}, (_body) => {
-            var body = JSON.parse(_body);
+            var body;
+            try {
+                body = JSON.parse(_body);
+            }
+            catch (error) {
+                this.log.error("Unable to parse message body" + error);
+            }
             if (body.success) {
                 _this.accessToken = body.result.access_token;
                 _this.refreshToken = body.result.refresh_token;

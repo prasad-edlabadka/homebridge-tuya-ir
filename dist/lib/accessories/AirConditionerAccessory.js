@@ -27,8 +27,8 @@ class AirConditionerAccessory {
         this.tuya = TuyaAPIHelper_1.TuyaAPIHelper.Instance(new Config_1.Config(platform.config.client_id, platform.config.secret, platform.config.region, platform.config.deviceId, platform.config.devices), platform.log);
         // set accessory information
         this.accessory.getService(this.platform.Service.AccessoryInformation)
-            .setCharacteristic(this.platform.Characteristic.Manufacturer, accessory.context.device.product_name)
-            .setCharacteristic(this.platform.Characteristic.Model, 'Unknown')
+            .setCharacteristic(this.platform.Characteristic.Manufacturer, accessory.context.device.brand)
+            .setCharacteristic(this.platform.Characteristic.Model, accessory.context.device.model)
             .setCharacteristic(this.platform.Characteristic.SerialNumber, accessory.context.device.id);
         // get the LightBulb service if it exists, otherwise create a new LightBulb service
         // you can create multiple services for each accessory
@@ -64,6 +64,33 @@ class AirConditionerAccessory {
         })
             .onGet(this.getRotationSpeedCharacteristic.bind(this))
             .onSet(this.setRotationSpeedCharacteristic.bind(this));
+        this.refreshStatus();
+    }
+    /**
+    * Load latest device status.
+    */
+    async refreshStatus() {
+        this.tuya.getACStatus(this.parentId, this.accessory.context.device.id, (body) => {
+            if (!body.success) {
+                this.platform.log.error(`Failed to get AC status due to error ${body.msg}`);
+                throw new this.platform.api.hap.HapStatusError(-70402 /* SERVICE_COMMUNICATION_FAILURE */);
+            }
+            else {
+                this.platform.log.info(`${this.accessory.displayName} status is ${JSON.stringify(body.result)}`);
+                var isOn = body.result.power === "1" ? true : false;
+                var mode = body.result.mode;
+                var temp = body.result.temp;
+                var fan = body.result.wind;
+                this.service.updateCharacteristic(this.platform.Characteristic.Active, isOn);
+                this.service.updateCharacteristic(this.platform.Characteristic.TargetHeatingCoolingState, mode);
+                this.service.updateCharacteristic(this.platform.Characteristic.CurrentTemperature, temp);
+                this.service.updateCharacteristic(this.platform.Characteristic.RotationSpeed, fan);
+                this.acStates.On = isOn;
+                this.acStates.mode = mode;
+                this.acStates.temperature = temp;
+                this.acStates.fan = fan;
+            }
+        });
     }
     /**
      * Handle "SET" requests from HomeKit
@@ -96,10 +123,9 @@ class AirConditionerAccessory {
      * this.service.updateCharacteristic(this.platform.Characteristic.On, true)
      */
     async getOn() {
-        // implement your own code to check if the device is on
+        //Just need to refresh in this function, as the API returns everything.
+        this.refreshStatus();
         const isOn = this.acStates.On;
-        // if you need to return an error to show the device as "Not Responding" in the Home app:
-        // throw new this.platform.api.hap.HapStatusError(this.platform.api.hap.HAPStatus.SERVICE_COMMUNICATION_FAILURE);
         return isOn;
     }
     /**
