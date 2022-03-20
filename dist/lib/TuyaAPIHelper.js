@@ -337,8 +337,7 @@ class TuyaAPIHelper {
         // eslint-disable-next-line @typescript-eslint/no-this-alias
         const _this = this;
         const parsedUrl = new url_1.URL(endpoint);
-        const query = parsedUrl.search.startsWith("?") ? parsedUrl.search.slice(1) : parsedUrl.search;
-        this._calculateSign(false, query, parsedUrl.pathname, 'GET');
+        this._calculateSign(false, parsedUrl.search, parsedUrl.pathname, 'GET');
         const options = {
             url: endpoint,
             headers: {
@@ -363,8 +362,7 @@ class TuyaAPIHelper {
         // eslint-disable-next-line @typescript-eslint/no-this-alias
         const _this = this;
         const parsedUrl = new url_1.URL(endpoint);
-        const query = parsedUrl.search.startsWith("?") ? parsedUrl.search.slice(1) : parsedUrl.search;
-        this._calculateSign(true, query, parsedUrl.pathname, method, JSON.stringify(body));
+        this._calculateSign(true, parsedUrl.search, parsedUrl.pathname, method, JSON.stringify(body));
         const options = {
             method: method,
             url: endpoint,
@@ -394,20 +392,9 @@ class TuyaAPIHelper {
         let sha256 = "";
         const headersStr = "";
         const map = {};
-        let arr = [];
         const bodyStr = body || "";
-        if (query) {
-            this.toJsonObj(query, arr, map);
-        }
         sha256 = crypto_js_1.default.SHA256(bodyStr);
-        if (arr.length > 0) {
-            arr = arr.sort();
-            url += '?';
-            arr.forEach(function (item) {
-                url += item + "=" + map[item] + "&";
-            });
-            url = url.substring(0, url.length - 1);
-        }
+        url = url + query;
         map["signUrl"] = method + "\n" + sha256 + "\n" + headersStr + "\n" + url;
         map["url"] = url;
         return map;
