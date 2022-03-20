@@ -6,7 +6,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.TuyaAPIHelper = void 0;
 const crypto_js_1 = __importDefault(require("crypto-js"));
 const request_1 = __importDefault(require("request"));
-const url_1 = __importDefault(require("url"));
+const url_1 = require("url");
 class TuyaAPIHelper {
     constructor(config, log) {
         this.accessToken = "";
@@ -336,8 +336,9 @@ class TuyaAPIHelper {
     _loginApiCall(endpoint, body, cb) {
         // eslint-disable-next-line @typescript-eslint/no-this-alias
         const _this = this;
-        const url = url_1.default.parse(endpoint, true);
-        this._calculateSign(false, "" + url.query, "" + url.pathname, 'GET');
+        const parsedUrl = new url_1.URL(endpoint);
+        const query = parsedUrl.search.startsWith("?") ? parsedUrl.search.slice(1) : parsedUrl.search;
+        this._calculateSign(false, query, parsedUrl.pathname, 'GET');
         const options = {
             url: endpoint,
             headers: {
@@ -361,8 +362,9 @@ class TuyaAPIHelper {
         this.log.debug(`Calling endpoint ${endpoint}`);
         // eslint-disable-next-line @typescript-eslint/no-this-alias
         const _this = this;
-        const url = url_1.default.parse(endpoint, true);
-        this._calculateSign(true, "" + url.query, "" + url.pathname, method, JSON.stringify(body));
+        const parsedUrl = new url_1.URL(endpoint);
+        const query = parsedUrl.search.startsWith("?") ? parsedUrl.search.slice(1) : parsedUrl.search;
+        this._calculateSign(true, query, parsedUrl.pathname, method, JSON.stringify(body));
         const options = {
             method: method,
             url: endpoint,

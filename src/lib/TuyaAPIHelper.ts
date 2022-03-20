@@ -3,7 +3,7 @@ import { Config } from "./Config";
 
 import CryptoJS from 'crypto-js';
 import request from 'request';
-import URL from 'url';
+import { URL } from 'url';
 
 export class TuyaAPIHelper {
     private constructor(config: Config, log: Logger) {
@@ -327,9 +327,10 @@ export class TuyaAPIHelper {
     _loginApiCall(endpoint: string, body: object, cb) {
         // eslint-disable-next-line @typescript-eslint/no-this-alias
         const _this = this;
-        const url = URL.parse(endpoint, true);
 
-        this._calculateSign(false, "" + url.query, "" + url.pathname, 'GET');
+        const parsedUrl = new URL(endpoint);
+        const query = parsedUrl.search.startsWith("?")?parsedUrl.search.slice(1):parsedUrl.search;
+        this._calculateSign(false, query, parsedUrl.pathname, 'GET');
         const options = {
             url: endpoint,
             headers: {
@@ -354,8 +355,9 @@ export class TuyaAPIHelper {
         this.log.debug(`Calling endpoint ${endpoint}`);
         // eslint-disable-next-line @typescript-eslint/no-this-alias
         const _this = this;
-        const url = URL.parse(endpoint, true);
-        this._calculateSign(true, "" + url.query, "" + url.pathname, method, JSON.stringify(body));
+        const parsedUrl = new URL(endpoint);
+        const query = parsedUrl.search.startsWith("?")?parsedUrl.search.slice(1):parsedUrl.search;
+        this._calculateSign(true, query, parsedUrl.pathname, method, JSON.stringify(body));
         const options = {
             method: method,
             url: endpoint,
