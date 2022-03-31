@@ -152,6 +152,36 @@ export class TuyaAPIHelper {
         }
     }
 
+    sendLearningCode(deviceId: string, remoteId: string, code:string, cb){
+        this.log.debug("Sending Learning Code");
+        this._apiCall(this.apiHost + `/v2.0/infrareds/${deviceId}/remotes/${remoteId}/learning-codes`, "POST", {code}, (_body, err) => {
+            let body = { success: false, msg: "Failed to invoke API" };
+            if (!err) {
+                try {
+                    body = JSON.parse(_body);
+                } catch (error) {
+                    this.log.error("Unable to parse message body" + error);
+                }
+            }
+            cb(body);
+        })
+    }
+
+    fetchLearningCodes(deviceId: string, remoteId: string, cb){
+        this.log.debug("Getting Learning Codes");
+        this._apiCall(this.apiHost + `/v2.0/infrareds/${deviceId}/remotes/${remoteId}/learning-codes`, "GET", {}, (_body, err) => {
+            let body = { success: false, msg: "Failed to invoke API" };
+            if (!err) {
+                try {
+                    body = JSON.parse(_body);
+                } catch (error) {
+                    this.log.error("Unable to parse message body" + error);
+                }
+            }
+            cb(body);
+        })
+    }
+
     sendACCommand(deviceId: string, remoteId: string, command: string, value: string | number, cb) {
         const commandObj = {
             "code": command,

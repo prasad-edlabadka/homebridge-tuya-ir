@@ -3,12 +3,14 @@ import { TuyaIRDiscovery } from './lib/TuyaIRDiscovery';
 import { AirConditionerAccessory } from './lib/accessories/AirConditionerAccessory';
 import { FanAccessory } from './lib/accessories/FanAccessory';
 import { GenericAccessory } from './lib/accessories/GenericAccessory';
+import {DoItYourselfAccessory} from "./lib/accessories/DoItYourselfAccessory";
 
 const PLATFORM_NAME = 'TuyaIR';
 const PLUGIN_NAME = 'homebridge-tuya-ir';
 const CLASS_DEF = {
   infrared_ac: AirConditionerAccessory,
-  infrared_fan: FanAccessory
+  infrared_fan: FanAccessory,
+  qt:DoItYourselfAccessory,
 };
 /**
  * HomebridgePlatform
