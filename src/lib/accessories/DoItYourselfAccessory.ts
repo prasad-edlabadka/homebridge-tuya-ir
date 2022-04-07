@@ -1,4 +1,4 @@
-import {Service, PlatformAccessory, CharacteristicValue, Characteristic} from 'homebridge';
+import { PlatformAccessory } from 'homebridge';
 import { TuyaIRPlatform } from '../../platform';
 import { Config } from '../Config';
 import { TuyaAPIHelper } from '../TuyaAPIHelper';

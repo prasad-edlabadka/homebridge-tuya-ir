@@ -3,7 +3,7 @@ import { TuyaIRDiscovery } from './lib/TuyaIRDiscovery';
 import { AirConditionerAccessory } from './lib/accessories/AirConditionerAccessory';
 import { FanAccessory } from './lib/accessories/FanAccessory';
 import { GenericAccessory } from './lib/accessories/GenericAccessory';
-import {DoItYourselfAccessory} from "./lib/accessories/DoItYourselfAccessory";
+import { DoItYourselfAccessory } from "./lib/accessories/DoItYourselfAccessory";
 
 const PLATFORM_NAME = 'TuyaIR';
 const PLUGIN_NAME = 'homebridge-tuya-ir';
