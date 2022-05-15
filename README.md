@@ -6,6 +6,7 @@
 </p>
 
 # Homebridge Tuya IR
+[![verified-by-homebridge](https://badgen.net/badge/homebridge/verified/purple)](https://github.com/homebridge/homebridge/wiki/Verified-Plugins)
 [![npm](https://img.shields.io/npm/v/homebridge-tuya-ir.svg)](https://www.npmjs.com/package/homebridge-tuya-ir)
 ![GitHub](https://img.shields.io/github/license/prasad-edlabadka/homebridge-tuya-ir)
 [![npm](https://img.shields.io/npm/dt/homebridge-tuya-ir.svg)](https://www.npmjs.com/package/homebridge-tuya-ir)
@@ -14,6 +15,7 @@
 
 ![GitHub contributors](https://img.shields.io/github/contributors-anon/prasad-edlabadka/homebridge-tuya-ir)
 ![GitHub last commit](https://img.shields.io/github/last-commit/prasad-edlabadka/homebridge-tuya-ir)
+
 
 
 Control your Tuya Smart IR based devices in HomeKit. Also works with Smart Home IR Blaster. You can add multiple Smart IR device to single configuration.
