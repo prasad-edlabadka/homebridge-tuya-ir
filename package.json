@@ -13,7 +13,7 @@
     "url": "https://github.com/prasad-edlabadka/homebridge-tuya-ir/issues"
   },
   "engines": {
-    "node": ">=10.17.0",
+    "node": ">=14.19.0",
     "homebridge": ">=1.3.0"
   },
   "main": "dist/index.js",
