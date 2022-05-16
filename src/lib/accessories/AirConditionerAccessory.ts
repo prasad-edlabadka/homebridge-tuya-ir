@@ -55,7 +55,7 @@ export class AirConditionerAccessory {
             .onSet(this.setOn.bind(this))      // SET - bind to the `setOn` method below
             .onGet(this.getOn.bind(this));     // GET - bind to the `getOn` method below
 
-        this.service.getCharacteristic(this.platform.Characteristic.TargetHeatingCoolingState)
+        this.service.getCharacteristic(this.platform.Characteristic.TargetHeaterCoolerState)
             .onSet(this.setHeatingCoolingState.bind(this))                // SET - bind to the `setHeatingCoolingState` method below
             .onGet(this.getHeatingCoolingState.bind(this));               // GET - bind to the `getHeatingCoolingState` method below
 
@@ -101,7 +101,7 @@ export class AirConditionerAccessory {
                 var temp = body.result.temp  as number;
                 var fan  = body.result.wind  as number;
                 this.service.updateCharacteristic(this.platform.Characteristic.Active, isOn);
-                this.service.updateCharacteristic(this.platform.Characteristic.TargetHeatingCoolingState, mode);
+                this.service.updateCharacteristic(this.platform.Characteristic.TargetHeaterCoolerState, mode);
                 this.service.updateCharacteristic(this.platform.Characteristic.CurrentTemperature, temp);
                 this.service.updateCharacteristic(this.platform.Characteristic.RotationSpeed, fan);
                 this.acStates.On          = isOn;
@@ -162,10 +162,10 @@ export class AirConditionerAccessory {
         var val = value as number;
         var command;
         var modeName = "";
-        if (val == this.platform.Characteristic.TargetHeatingCoolingState.COOL) {
+        if (val == this.platform.Characteristic.TargetHeaterCoolerState.COOL) {
             command = 0;
             modeName = "Cool";
-        } else if (val == this.platform.Characteristic.TargetHeatingCoolingState.HEAT) {
+        } else if (val == this.platform.Characteristic.TargetHeaterCoolerState.HEAT) {
             command = 1;
             modeName = "Heat";
         } else {
