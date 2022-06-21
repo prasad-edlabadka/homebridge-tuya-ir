@@ -65,7 +65,7 @@ export class AirConditionerAccessory {
         this.service.getCharacteristic(this.platform.Characteristic.CoolingThresholdTemperature)
             .setProps({
                 minValue: 16,
-                maxValue: 28,
+                maxValue: 30,
                 minStep: 1,
             })
             .onGet(this.getCoolingThresholdTemperatureCharacteristic.bind(this))
