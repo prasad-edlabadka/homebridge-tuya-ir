@@ -30,9 +30,6 @@ class AirConditionerAccessory extends BaseAccessory_1.BaseAccessory {
         this.service.getCharacteristic(this.platform.Characteristic.TargetHeaterCoolerState)
             .onSet(this.setHeatingCoolingState.bind(this))
             .onGet(this.getHeatingCoolingState.bind(this));
-        this.service.getCharacteristic(this.platform.Characteristic.TargetTemperature)
-            .onSet(this.setTargetTemperature.bind(this))
-            .onGet(this.getTargetTemperature.bind(this));
         this.service.getCharacteristic(this.platform.Characteristic.CurrentTemperature)
             .onGet(this.getCurrentTemperature.bind(this));
         this.service.getCharacteristic(this.platform.Characteristic.CoolingThresholdTemperature)
@@ -87,22 +84,6 @@ class AirConditionerAccessory extends BaseAccessory_1.BaseAccessory {
     }
     getOn() {
         return this.acStates.On;
-    }
-    setTargetTemperature(value) {
-        const command = value;
-        this.sendACCommand(this.parentId, this.accessory.context.device.id, "temp", command, (body) => {
-            if (!body.success) {
-                this.log.error(`Failed to change AC temperature due to error ${body.msg}`);
-            }
-            else {
-                this.log.info(`${this.accessory.displayName} temperature is set to ${command} degrees.`);
-                this.acStates.temperature = command;
-                this.service.updateCharacteristic(this.platform.Characteristic.CurrentTemperature, command);
-            }
-        });
-    }
-    getTargetTemperature() {
-        return this.acStates.temperature;
     }
     setHeatingCoolingState(value) {
         const val = value;

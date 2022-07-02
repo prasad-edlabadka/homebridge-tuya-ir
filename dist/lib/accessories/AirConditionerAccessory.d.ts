@@ -19,8 +19,6 @@ export declare class AirConditionerAccessory extends BaseAccessory {
     refreshStatus(): void;
     setOn(value: CharacteristicValue): void;
     getOn(): CharacteristicValue;
-    setTargetTemperature(value: CharacteristicValue): void;
-    getTargetTemperature(): CharacteristicValue;
     setHeatingCoolingState(value: CharacteristicValue): void;
     getHeatingCoolingState(): CharacteristicValue;
     getCoolingThresholdTemperatureCharacteristic(): CharacteristicValue;

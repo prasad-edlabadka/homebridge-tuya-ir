@@ -128,7 +128,7 @@ class TuyaIRPlatform {
                 }
             }
             //Remove accessories removed from config.
-            const accessoriesToRemove = this.accessories.filter(acc => foundAccessories.some(foundAccessory => foundAccessory.UUID !== acc.UUID));
+            const accessoriesToRemove = this.accessories.filter(acc => !foundAccessories.some(foundAccessory => foundAccessory.UUID === acc.UUID));
             this.log.info(`Removing ${accessoriesToRemove.length} accessories as they are no longer configured...`);
             this.api.unregisterPlatformAccessories(PLUGIN_NAME, PLATFORM_NAME, accessoriesToRemove);
             foundAccessories = [];
