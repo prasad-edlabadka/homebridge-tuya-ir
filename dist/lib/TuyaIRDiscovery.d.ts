@@ -1,11 +1,10 @@
-declare const EventEmitter: any;
-import { Logger } from 'homebridge';
+/// <reference types="node" />
+import EventEmitter from 'events';
+import { Logger, PlatformConfig } from 'homebridge';
 export declare class TuyaIRDiscovery extends EventEmitter {
-    private config;
-    private api;
-    readonly log: Logger;
-    constructor(log: any, api: any);
-    start(api: any, props: any, index: any, cb: any): void;
+    private readonly log;
+    private platformConfig;
+    constructor(log: Logger, platformConfig: PlatformConfig);
+    startDiscovery(index: any, cb: any): void;
 }
-export {};
 //# sourceMappingURL=TuyaIRDiscovery.d.ts.map

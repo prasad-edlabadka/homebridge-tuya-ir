@@ -12,6 +12,7 @@ const CLASS_DEF = {
   infrared_fan: FanAccessory,
   qt:DoItYourselfAccessory,
 };
+
 /**
  * HomebridgePlatform
  * This class is the main constructor for your plugin, this is where you should
@@ -41,7 +42,6 @@ export class TuyaIRPlatform implements DynamicPlatformPlugin {
     // to start discovery of new accessories.
     this.api.on('didFinishLaunching', () => {
       log.debug('Executed didFinishLaunching callback');
-      // run the method to discover / register your devices as accessories
       this.discoverDevices();
     });
   }
@@ -65,20 +65,21 @@ export class TuyaIRPlatform implements DynamicPlatformPlugin {
   discoverDevices() {
 
     //if (!this.config.devices) return this.log.error("No devices configured. Please configure atleast one device.");
-    if (!this.config.client_id) return this.log.error("Client ID is not configured. Please check your config.json");
-    if (!this.config.secret) return this.log.error("Client Secret is not configured. Please check your config.json");
-    if (!this.config.region) return this.log.error("Region is not configured. Please check your config.json");
+    if (!this.config.tuyaAPIClientId) return this.log.error("Client ID is not configured. Please check your config.json");
+    if (!this.config.tuyaAPISecret) return this.log.error("Client Secret is not configured. Please check your config.json");
+    if (!this.config.deviceRegion) return this.log.error("Region is not configured. Please check your config.json");
     //if (!this.config.deviceId) return this.log.error("IR Blaster device ID is not configured. Please check your config.json");
 
     this.log.info('Starting discovery...');
-    const tuya: TuyaIRDiscovery = new TuyaIRDiscovery(this.log, this.api);
+    const tuya: TuyaIRDiscovery = new TuyaIRDiscovery(this.log, this.config);
     this.discover(tuya, 0, this.config.smartIR.length);
   }
 
   discover(tuya, i, total) {
-    tuya.start(this.api, this.config, i, (devices, index) => {
+    tuya.startDiscovery(i, (devices, index) => {
 
       this.log.debug(JSON.stringify(devices));
+      let foundAccessories: PlatformAccessory[] = [];
       //loop over the discovered devices and register each one if it has not already been registered
       for (const device of devices) {
         if (device) {
@@ -93,7 +94,6 @@ export class TuyaIRPlatform implements DynamicPlatformPlugin {
           // see if an accessory with the same uuid has already been registered and restored from
           // the cached devices we stored in the `configureAccessory` method above
           const existingAccessory = this.accessories.find(accessory => accessory.UUID === uuid);
-
           if (existingAccessory) {
             // the accessory already exists
             this.log.info('Restoring existing accessory from cache:', existingAccessory.displayName);
@@ -104,7 +104,10 @@ export class TuyaIRPlatform implements DynamicPlatformPlugin {
 
             // create the accessory handler for the restored accessory
             // this is imported from `platformAccessory.ts`
+            existingAccessory.context.device = device;
+            foundAccessories.push(existingAccessory);
             if (Accessory) {
+              this.api.updatePlatformAccessories([existingAccessory]);
               new Accessory(this, existingAccessory);
             } else {
               this.api.unregisterPlatformAccessories(PLUGIN_NAME, PLATFORM_NAME, [existingAccessory]);
@@ -127,6 +130,7 @@ export class TuyaIRPlatform implements DynamicPlatformPlugin {
               // store a copy of the device object in the `accessory.context`
               // the `context` property can be used to store any data about the accessory you may need
               accessory.context.device = device;
+              //foundAccessories.push(accessory);
 
               // create the accessory handler for the newly create accessory
               // this is imported from `platformAccessory.ts`
@@ -140,6 +144,11 @@ export class TuyaIRPlatform implements DynamicPlatformPlugin {
           }
         }
       }
+      //Remove accessories removed from config.
+      const accessoriesToRemove = this.accessories.filter(acc => foundAccessories.some(foundAccessory => foundAccessory.UUID !== acc.UUID));
+      this.log.info(`Removing ${accessoriesToRemove.length} accessories as they are no longer configured...`);
+      this.api.unregisterPlatformAccessories(PLUGIN_NAME, PLATFORM_NAME, accessoriesToRemove);
+      foundAccessories = [];
       i++;
       if(i < total) {
         this.discover(tuya, i, total);

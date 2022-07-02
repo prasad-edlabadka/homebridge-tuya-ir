@@ -1,82 +1,53 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.GenericAccessory = void 0;
-const Config_1 = require("../Config");
-const TuyaAPIHelper_1 = require("../TuyaAPIHelper");
+const APIInvocationHelper_1 = require("../api/APIInvocationHelper");
+const BaseAccessory_1 = require("./BaseAccessory");
 /**
  * Generic Accessory
  * An instance of this class is created for each accessory your platform registers
  * Each accessory may expose multiple services of different service types.
  */
-class GenericAccessory {
+class GenericAccessory extends BaseAccessory_1.BaseAccessory {
     constructor(platform, accessory) {
+        var _a;
+        super(platform, accessory);
         this.platform = platform;
         this.accessory = accessory;
-        /**
-         * These are just used to create a working example
-         * You should implement your own code to track the state of your accessory
-         */
         this.switchStates = {
             On: this.platform.Characteristic.Active.INACTIVE
         };
-        this.parentId = "";
         this.powerCommand = 1;
-        this.parentId = accessory.context.device.ir_id;
-        this.tuya = TuyaAPIHelper_1.TuyaAPIHelper.Instance(new Config_1.Config(platform.config.client_id, platform.config.secret, platform.config.region, platform.config.deviceId, platform.config.devices), platform.log);
+        this.sendCommandAPIURL = `${this.configuration.apiHost}/v1.0/infrareds/${this.parentId}/remotes/${accessory.context.device.id}/raw/command`;
         // set accessory information
-        this.accessory.getService(this.platform.Service.AccessoryInformation)
-            .setCharacteristic(this.platform.Characteristic.Manufacturer, accessory.context.device.product_name)
-            .setCharacteristic(this.platform.Characteristic.Model, 'Infrared Controlled Switch')
-            .setCharacteristic(this.platform.Characteristic.SerialNumber, accessory.context.device.id);
-        // get the LightBulb service if it exists, otherwise create a new LightBulb service
-        // you can create multiple services for each accessory
+        (_a = this.accessory.getService(this.platform.Service.AccessoryInformation)) === null || _a === void 0 ? void 0 : _a.setCharacteristic(this.platform.Characteristic.Manufacturer, accessory.context.device.product_name).setCharacteristic(this.platform.Characteristic.Model, 'Infrared Controlled Switch').setCharacteristic(this.platform.Characteristic.SerialNumber, accessory.context.device.id);
         this.service = this.accessory.getService(this.platform.Service.Switch) || this.accessory.addService(this.platform.Service.Switch);
-        // set the service name, this is what is displayed as the default name on the Home app
-        // in this example we are using the name we stored in the `accessory.context` in the `discoverDevices` method.
         this.service.setCharacteristic(this.platform.Characteristic.Name, accessory.context.device.name);
-        // each service must implement at-minimum the "required characteristics" for the given service type
-        // see https://developers.homebridge.io/#/service/Lightbulb
-        // register handlers for the On/Off Characteristic
         this.service.getCharacteristic(this.platform.Characteristic.On)
-            .onSet(this.setOn.bind(this)) // SET - bind to the `setOn` method below
-            .onGet(this.getOn.bind(this)); // GET - bind to the `getOn` method below
+            .onSet(this.setOn.bind(this))
+            .onGet(this.getOn.bind(this));
     }
-    setup(platform, accessory) {
-    }
-    /**
-     * Handle "SET" requests from HomeKit
-     * These are sent when the user changes the state of an accessory, for example, turning on a Light bulb.
-     */
-    async setOn(value) {
-        // implement your own code to turn your device on/off
+    setOn(value) {
         if (this.switchStates.On != value) {
-            var command = this.powerCommand;
-            this.tuya.sendFanCommand(this.parentId, this.accessory.context.device.id, command, false, (body) => {
+            this.sendCommand(this.powerCommand, (body) => {
                 if (!body.success) {
-                    this.platform.log.error(`Failed to change device status due to error ${body.msg}`);
+                    this.log.error(`Failed to change device status due to error ${body.msg}`);
                 }
                 else {
-                    this.platform.log.info(`${this.accessory.displayName} is now ${value == 0 ? 'Off' : 'On'}`);
+                    this.log.info(`${this.accessory.displayName} is now ${value == 0 ? 'Off' : 'On'}`);
                     this.switchStates.On = value;
                 }
             });
         }
     }
-    /**
-     * Handle the "GET" requests from HomeKit
-     * These are sent when HomeKit wants to know the current state of the accessory, for example, checking if a Light bulb is on.
-     *
-     * GET requests should return as fast as possbile. A long delay here will result in
-     * HomeKit being unresponsive and a bad user experience in general.
-     *
-     * If your device takes time to respond you should update the status of your device
-     * asynchronously instead using the `updateCharacteristic` method instead.
-  
-     * @example
-     * this.service.updateCharacteristic(this.platform.Characteristic.On, true)
-     */
-    async getOn() {
+    getOn() {
         return this.switchStates.On;
+    }
+    sendCommand(command, cb) {
+        const commandObj = { 'code': command };
+        APIInvocationHelper_1.APIInvocationHelper.invokeTuyaIrApi(this.log, this.configuration, this.sendCommandAPIURL, "POST", commandObj, (body) => {
+            cb(body);
+        });
     }
 }
 exports.GenericAccessory = GenericAccessory;

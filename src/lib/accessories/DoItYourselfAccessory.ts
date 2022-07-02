@@ -1,31 +1,29 @@
 import { PlatformAccessory } from 'homebridge';
 import { TuyaIRPlatform } from '../../platform';
-import { Config } from '../Config';
-import { TuyaAPIHelper } from '../TuyaAPIHelper';
+import { APIInvocationHelper } from '../api/APIInvocationHelper';
+import { BaseAccessory } from './BaseAccessory';
 
 /**
  * Do It Yourself Accessory
  * An instance of this class is created for each accessory your platform registers
  * Each accessory may expose multiple services of different service types.
  */
-export class DoItYourselfAccessory {
-    private tuya: TuyaAPIHelper;
-
+export class DoItYourselfAccessory extends BaseAccessory {
     constructor(
         private readonly platform: TuyaIRPlatform,
         private readonly accessory: PlatformAccessory,
     ) {
-        this.tuya = TuyaAPIHelper.Instance(new Config(platform.config.client_id, platform.config.secret, platform.config.region, platform.config.deviceId, platform.config.devices), platform.log);
+        super(platform, accessory);
         // set accessory information
-        this.accessory.getService(this.platform.Service.AccessoryInformation)!
-            .setCharacteristic(this.platform.Characteristic.Manufacturer, accessory.context.device.product_name)
+        this.accessory.getService(this.platform.Service.AccessoryInformation)
+            ?.setCharacteristic(this.platform.Characteristic.Manufacturer, accessory.context.device.product_name)
             .setCharacteristic(this.platform.Characteristic.Model, 'Infrared Controlled Switch')
             .setCharacteristic(this.platform.Characteristic.SerialNumber, accessory.context.device.id);
 
 
-        this.tuya.fetchLearningCodes(this.accessory.context.device.ir_id, this.accessory.context.device.id, (body) =>{
+        this.fetchLearningCodes(this.accessory.context.device.ir_id, this.accessory.context.device.id, (body) =>{
             if (!body.success) {
-                this.platform.log.error(`Failed to fetch learning codes due to error ${body.msg}`);
+                this.log.error(`Failed to fetch learning codes due to error ${body.msg}`);
             } else {
                 this.accessory.context.device.codes = body.result
 
@@ -41,7 +39,7 @@ export class DoItYourselfAccessory {
                 }
 
                 for(const code of this.accessory.context.device.codes){
-                    this.platform.log.info(`Adding code ${code.key_name}`);
+                    this.log.info(`Adding code ${code.key_name}`);
                     const service = this.accessory.getService(this.platform.api.hap.uuid.generate(code.key_name)) || accessory.addService(this.platform.api.hap.Service.Switch, code.key_name, this.platform.api.hap.uuid.generate(code.key_name), code.key);
                     service.getCharacteristic(this.platform.Characteristic.On)
                         .onGet(() => {
@@ -49,9 +47,9 @@ export class DoItYourselfAccessory {
                         })
                         .onSet(((value) => {
                             if(value){
-                                this.tuya.sendLearningCode(this.accessory.context.device.ir_id, this.accessory.context.device.id, code.code, (body) =>{
+                                this.sendLearningCode(this.accessory.context.device.ir_id, this.accessory.context.device.id, code.code, (body) =>{
                                     if (!body.success) {
-                                        this.platform.log.error(`Failed to fetch learning codes due to error ${body.msg}`);
+                                        this.log.error(`Failed to fetch learning codes due to error ${body.msg}`);
                                     }
                                     service.setCharacteristic(this.platform.Characteristic.On, false);
                                 });
@@ -61,5 +59,19 @@ export class DoItYourselfAccessory {
 
             }
         })
+    }
+
+    sendLearningCode(deviceId: string, remoteId: string, code:string, cb){
+        this.log.debug("Sending Learning Code");
+        APIInvocationHelper.invokeTuyaIrApi(this.log, this.configuration, this.configuration.apiHost + `/v2.0/infrareds/${deviceId}/remotes/${remoteId}/learning-codes`, "POST", {code}, (body) => {
+            cb(body);
+        });
+    }
+
+    fetchLearningCodes(deviceId: string, remoteId: string, cb){
+        this.log.debug("Getting Learning Codes");
+        APIInvocationHelper.invokeTuyaIrApi(this.log, this.configuration, this.configuration.apiHost + `/v2.0/infrareds/${deviceId}/remotes/${remoteId}/learning-codes`, "GET", {}, (body) => {
+            cb(body);
+        });
     }
 }

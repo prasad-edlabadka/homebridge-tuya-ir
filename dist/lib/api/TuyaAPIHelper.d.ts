@@ -1,6 +1,7 @@
 import { Logger } from "homebridge";
-import { Config } from "./Config";
+import { TuyaIRConfiguration } from "../model/TuyaIRConfiguration";
 export declare class TuyaAPIHelper {
+    private config;
     private constructor();
     private accessToken;
     private refreshToken;
@@ -10,9 +11,8 @@ export declare class TuyaAPIHelper {
     private timestamp;
     private signKey;
     private log;
-    private config;
     private static _instance;
-    static Instance(config: Config, log: Logger): TuyaAPIHelper;
+    static Instance(config: TuyaIRConfiguration, log: Logger): TuyaAPIHelper;
     login(cb: any): void;
     fetchDevices(deviceId: string, cb: any): void;
     _manualFetch(cb: any): void;

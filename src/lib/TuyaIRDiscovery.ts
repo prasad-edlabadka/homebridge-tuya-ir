@@ -1,29 +1,30 @@
-const EventEmitter = require('events');
-import { API, Logger } from 'homebridge';
-import { Config } from './Config';
-import { TuyaAPIHelper } from './TuyaAPIHelper';
+import EventEmitter from 'events';
+import { Logger, PlatformConfig } from 'homebridge';
+import { TuyaIRConfiguration } from './model/TuyaIRConfiguration';
+import { LoginHelper } from './api/LoginHelper';
+import { DeviceConfigurationHelper } from './api/DeviceConfigurationHelper';
 
 export class TuyaIRDiscovery extends EventEmitter {
+    private platformConfig: PlatformConfig;
 
-    private config: Config = new Config();
-    private api: API;
-    public readonly log: Logger;
-
-    constructor(log, api) {
+    constructor(private readonly log: Logger, platformConfig: PlatformConfig) {
         super();
-        this.log = log;
-        this.api = api;
+        this.platformConfig = platformConfig;
     }
 
-    start(api, props, index, cb) {
+    startDiscovery(index, cb) {
         this.log.info(`Trying to login...`);
-        this.config = new Config(props.client_id, props.secret, props.region, props.smartIR[index].deviceId, props.smartIR[index].autoFetchRemotes, props.smartIR[index].devices);
-        var helper = TuyaAPIHelper.Instance(this.config, this.log);
-        helper.login(() => {
-            this.log.info("Fetching configured remotes...");
-            helper.fetchDevices(this.config.deviceId, (devs: any[]) => {
+        const configuration = new TuyaIRConfiguration(this.platformConfig, index);
+        const loginHelper = LoginHelper.Instance(configuration, this.log);
+        const deviceConfigHelper = DeviceConfigurationHelper.Instance(configuration, this.log);
+        loginHelper.login()
+            .then(() => {
+                this.log.info("Fetching configured remotes...");
+                return deviceConfigHelper.fetchDevices(configuration.irDeviceId);
+            }).then((devs) => {
                 cb(devs, index);
+            }).catch(error => {
+                this.log.error("Failed because of " + error);
             });
-        })
     }
 }

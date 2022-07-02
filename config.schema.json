@@ -1,6 +1,7 @@
 {
   "pluginAlias": "TuyaIR",
   "pluginType": "platform",
+  "headerDisplay": "**Control your Tuya Smart IR based devices in HomeKit. Also works with Smart Home IR Blaster. You can add multiple Smart IR device to single configuration.**",
   "singular": true,
   "schema": {
     "type": "object",
@@ -11,21 +12,21 @@
         "required": true,
         "default": "TuyaIR"
       },
-      "client_id": {
+      "tuyaAPIClientId": {
         "title": "Client ID",
         "type": "string",
         "required": true,
         "default": "",
         "description": "Your Tuya IOT cloud project's client ID"
       },
-      "secret": {
+      "tuyaAPISecret": {
         "title": "Client Secret",
         "type": "string",
         "required": true,
         "default": "",
         "description": "Your Tuya IOT cloud project's secret"
       },
-      "region": {
+      "deviceRegion": {
         "title": "Device Region",
         "type": "string",
         "required": true,
@@ -71,14 +72,14 @@
               "default": "",
               "description": "Device Id of the Smart IR Device"
             },
-            "autoFetchRemotes": {
+            "autoFetchRemotesFromServer": {
               "title": "Fetch configured remotes automatically?",
               "type": "boolean",
               "required": true,
               "default": true,
               "description": "Uncheck this box if your IR remotes are not discovered automatically. You will need to add your remote IDs manually below"
             },
-            "devices": {
+            "configuredRemotes": {
               "title": "List of configured Smart IR Remotes",
               "type": "array",
               "items": {
@@ -113,7 +114,7 @@
                 }
               },
               "condition": {
-                "functionBody": "return model.smartIR[arrayIndices].autoFetchRemotes === false;"
+                "functionBody": "return model.smartIR[arrayIndices].autoFetchRemotesFromServer === false;"
               }
             }
           }

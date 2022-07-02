@@ -12,6 +12,10 @@
   "bugs": {
     "url": "https://github.com/prasad-edlabadka/homebridge-tuya-ir/issues"
   },
+  "funding": {
+    "type" : "paypal",
+    "url" : "https://paypal.me/prasadedlabadkar"
+  },
   "engines": {
     "node": ">=14.19.0",
     "homebridge": ">=1.3.0"
@@ -36,7 +40,7 @@
     "@typescript-eslint/eslint-plugin": "^5.15.0",
     "@typescript-eslint/parser": "^5.15.0",
     "eslint": "^7.21.0",
-    "homebridge": "^1.3.1",
+    "homebridge": "^1.5.0",
     "nodemon": "^2.0.7",
     "rimraf": "^3.0.2",
     "ts-node": "^9.1.1",

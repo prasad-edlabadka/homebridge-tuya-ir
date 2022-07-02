@@ -1,58 +1,41 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.AirConditionerAccessory = void 0;
-const Config_1 = require("../Config");
-const TuyaAPIHelper_1 = require("../TuyaAPIHelper");
+const BaseAccessory_1 = require("./BaseAccessory");
+const APIInvocationHelper_1 = require("../api/APIInvocationHelper");
 /**
  * Air Conditioner Accessory
  * An instance of this class is created for each accessory your platform registers
  * Each accessory may expose multiple services of different service types.
  */
-class AirConditionerAccessory {
+class AirConditionerAccessory extends BaseAccessory_1.BaseAccessory {
     constructor(platform, accessory) {
+        var _a;
+        super(platform, accessory);
         this.platform = platform;
         this.accessory = accessory;
-        /**
-         * These are just used to create a working example
-         * You should implement your own code to track the state of your accessory
-         */
+        this.modeList = ['Cool', 'Heat', 'Auto'];
         this.acStates = {
             On: false,
             temperature: 16,
             fan: 0,
             mode: 0
         };
-        this.parentId = "";
-        this.parentId = accessory.context.device.ir_id;
-        this.tuya = TuyaAPIHelper_1.TuyaAPIHelper.Instance(new Config_1.Config(platform.config.client_id, platform.config.secret, platform.config.region, platform.config.deviceId, platform.config.devices), platform.log);
-        // set accessory information
-        this.accessory.getService(this.platform.Service.AccessoryInformation)
-            .setCharacteristic(this.platform.Characteristic.Manufacturer, accessory.context.device.brand)
-            .setCharacteristic(this.platform.Characteristic.Model, accessory.context.device.model)
-            .setCharacteristic(this.platform.Characteristic.SerialNumber, accessory.context.device.id);
-        // get the LightBulb service if it exists, otherwise create a new LightBulb service
-        // you can create multiple services for each accessory
+        (_a = this.accessory.getService(this.platform.Service.AccessoryInformation)) === null || _a === void 0 ? void 0 : _a.setCharacteristic(this.platform.Characteristic.Manufacturer, accessory.context.device.brand || 'Unknown').setCharacteristic(this.platform.Characteristic.Model, accessory.context.device.model || 'Unknown').setCharacteristic(this.platform.Characteristic.SerialNumber, accessory.context.device.id);
         this.service = this.accessory.getService(this.platform.Service.HeaterCooler) || this.accessory.addService(this.platform.Service.HeaterCooler);
-        // set the service name, this is what is displayed as the default name on the Home app
-        // in this example we are using the name we stored in the `accessory.context` in the `discoverDevices` method.
         this.service.setCharacteristic(this.platform.Characteristic.Name, accessory.context.device.name);
-        // each service must implement at-minimum the "required characteristics" for the given service type
-        // see https://developers.homebridge.io/#/service/Lightbulb
-        // register handlers for the On/Off Characteristic
         this.service.getCharacteristic(this.platform.Characteristic.Active)
-            .onSet(this.setOn.bind(this)) // SET - bind to the `setOn` method below
-            .onGet(this.getOn.bind(this)); // GET - bind to the `getOn` method below
-        this.service.getCharacteristic(this.platform.Characteristic.TargetHeatingCoolingState)
-            .onSet(this.setHeatingCoolingState.bind(this)) // SET - bind to the `setHeatingCoolingState` method below
-            .onGet(this.getHeatingCoolingState.bind(this)); // GET - bind to the `getHeatingCoolingState` method below
+            .onSet(this.setOn.bind(this))
+            .onGet(this.getOn.bind(this));
+        this.service.getCharacteristic(this.platform.Characteristic.TargetHeaterCoolerState)
+            .onSet(this.setHeatingCoolingState.bind(this))
+            .onGet(this.getHeatingCoolingState.bind(this));
+        this.service.getCharacteristic(this.platform.Characteristic.TargetTemperature)
+            .onSet(this.setTargetTemperature.bind(this))
+            .onGet(this.getTargetTemperature.bind(this));
         this.service.getCharacteristic(this.platform.Characteristic.CurrentTemperature)
-            .onGet(this.getCurrentTemperature.bind(this)); // GET - bind to the `getOn` method below
+            .onGet(this.getCurrentTemperature.bind(this));
         this.service.getCharacteristic(this.platform.Characteristic.CoolingThresholdTemperature)
-            .setProps({
-            minValue: 16,
-            maxValue: 28,
-            minStep: 1,
-        })
             .onGet(this.getCoolingThresholdTemperatureCharacteristic.bind(this))
             .onSet(this.setCoolingThresholdTemperatureCharacteristic.bind(this));
         this.service.getCharacteristic(this.platform.Characteristic.RotationSpeed)
@@ -69,153 +52,128 @@ class AirConditionerAccessory {
     /**
     * Load latest device status.
     */
-    async refreshStatus() {
-        this.tuya.getACStatus(this.parentId, this.accessory.context.device.id, (body) => {
+    refreshStatus() {
+        this.getACStatus(this.parentId, this.accessory.context.device.id, (body) => {
             if (!body.success) {
-                this.platform.log.error(`Failed to get AC status due to error ${body.msg}`);
-                throw new this.platform.api.hap.HapStatusError(-70402 /* SERVICE_COMMUNICATION_FAILURE */);
+                this.log.error(`Failed to get AC status due to error ${body.msg}`);
             }
             else {
-                this.platform.log.info(`${this.accessory.displayName} status is ${JSON.stringify(body.result)}`);
-                var isOn = body.result.power === "1" ? true : false;
-                var mode = body.result.mode;
-                var temp = body.result.temp;
-                var fan = body.result.wind;
-                this.service.updateCharacteristic(this.platform.Characteristic.Active, isOn);
-                this.service.updateCharacteristic(this.platform.Characteristic.TargetHeatingCoolingState, mode);
-                this.service.updateCharacteristic(this.platform.Characteristic.CurrentTemperature, temp);
-                this.service.updateCharacteristic(this.platform.Characteristic.RotationSpeed, fan);
-                this.acStates.On = isOn;
-                this.acStates.mode = mode;
-                this.acStates.temperature = temp;
-                this.acStates.fan = fan;
+                this.log.debug(`${this.accessory.displayName} status is ${JSON.stringify(body.result)}`);
+                this.acStates.On = body.result.power === "1" ? true : false;
+                this.acStates.mode = body.result.mode;
+                this.acStates.temperature = body.result.temp;
+                this.acStates.fan = body.result.wind;
+                this.service.updateCharacteristic(this.platform.Characteristic.Active, this.acStates.On);
+                this.service.updateCharacteristic(this.platform.Characteristic.TargetHeaterCoolerState, this.acStates.mode);
+                this.service.updateCharacteristic(this.platform.Characteristic.CurrentTemperature, this.acStates.temperature);
+                this.service.updateCharacteristic(this.platform.Characteristic.RotationSpeed, this.acStates.fan);
             }
+            setTimeout(this.refreshStatus.bind(this), 30000);
         });
     }
-    /**
-     * Handle "SET" requests from HomeKit
-     * These are sent when the user changes the state of an accessory, for example, turning on a Light bulb.
-     */
-    async setOn(value) {
-        // implement your own code to turn your device on/off
-        var command = value ? 1 : 0;
-        this.tuya.sendACCommand(this.parentId, this.accessory.context.device.id, "power", command, (body) => {
+    setOn(value) {
+        if (this.acStates.On == value)
+            return;
+        const command = value ? 1 : 0;
+        this.sendACCommand(this.parentId, this.accessory.context.device.id, "power", command, (body) => {
             if (!body.success) {
-                this.platform.log.error(`Failed to change AC status due to error ${body.msg}`);
+                this.log.error(`Failed to change AC status due to error ${body.msg}`);
             }
             else {
-                this.platform.log.info(`${this.accessory.displayName} is now ${command == 0 ? 'Off' : 'On'}`);
+                this.log.info(`${this.accessory.displayName} is now ${command == 0 ? 'Off' : 'On'}`);
                 this.acStates.On = value;
             }
         });
     }
-    /**
-     * Handle the "GET" requests from HomeKit
-     * These are sent when HomeKit wants to know the current state of the accessory, for example, checking if a Light bulb is on.
-     *
-     * GET requests should return as fast as possbile. A long delay here will result in
-     * HomeKit being unresponsive and a bad user experience in general.
-     *
-     * If your device takes time to respond you should update the status of your device
-     * asynchronously instead using the `updateCharacteristic` method instead.
-  
-     * @example
-     * this.service.updateCharacteristic(this.platform.Characteristic.On, true)
-     */
-    async getOn() {
-        //Just need to refresh in this function, as the API returns everything.
-        this.refreshStatus();
-        const isOn = this.acStates.On;
-        return isOn;
+    getOn() {
+        return this.acStates.On;
     }
-    /**
-     * Handle "SET" requests from HomeKit
-     * These are sent when the user changes the state of an accessory, for example, turning on a Light bulb.
-     */
-    async setHeatingCoolingState(value) {
-        // implement your own code to turn your device on/off
-        var val = value;
-        var command;
-        var modeName = "";
-        if (val == this.platform.Characteristic.TargetHeatingCoolingState.COOL) {
-            command = 0;
-            modeName = "Cool";
-        }
-        else if (val == this.platform.Characteristic.TargetHeatingCoolingState.HEAT) {
-            command = 1;
-            modeName = "Heat";
-        }
-        else {
-            command = 2;
-            modeName = "Auto";
-        }
-        this.tuya.sendACCommand(this.parentId, this.accessory.context.device.id, "mode", command, (body) => {
+    setTargetTemperature(value) {
+        const command = value;
+        this.sendACCommand(this.parentId, this.accessory.context.device.id, "temp", command, (body) => {
             if (!body.success) {
-                this.platform.log.error(`Failed to change AC mode due to error ${body.msg}`);
+                this.log.error(`Failed to change AC temperature due to error ${body.msg}`);
             }
             else {
-                this.platform.log.info(`${this.accessory.displayName} mode is ${modeName}`);
-                this.acStates.mode = val;
-            }
-        });
-    }
-    /**
-     * Handle the "GET" requests from HomeKit
-     * These are sent when HomeKit wants to know the current state of the accessory, for example, checking if a Light bulb is on.
-     *
-     * GET requests should return as fast as possbile. A long delay here will result in
-     * HomeKit being unresponsive and a bad user experience in general.
-     *
-     * If your device takes time to respond you should update the status of your device
-     * asynchronously instead using the `updateCharacteristic` method instead.
-  
-     * @example
-     * this.service.updateCharacteristic(this.platform.Characteristic.On, true)
-     */
-    async getHeatingCoolingState() {
-        // implement your own code to check if the device is on
-        const isOn = this.acStates.mode;
-        // if you need to return an error to show the device as "Not Responding" in the Home app:
-        // throw new this.platform.api.hap.HapStatusError(this.platform.api.hap.HAPStatus.SERVICE_COMMUNICATION_FAILURE);
-        return isOn;
-    }
-    async getCoolingThresholdTemperatureCharacteristic() {
-        //this.platform.log.info("" + this.acStates.temperature);
-        const t = this.acStates.temperature;
-        return t;
-    }
-    async setCoolingThresholdTemperatureCharacteristic(value) {
-        //Change termperature
-        var command = value;
-        this.tuya.sendACCommand(this.parentId, this.accessory.context.device.id, "temp", command, (body) => {
-            if (!body.success) {
-                this.platform.log.error(`Failed to change AC temperature due to error ${body.msg}`);
-            }
-            else {
-                this.platform.log.info(`${this.accessory.displayName} temperature is set to ${command} degrees.`);
+                this.log.info(`${this.accessory.displayName} temperature is set to ${command} degrees.`);
                 this.acStates.temperature = command;
                 this.service.updateCharacteristic(this.platform.Characteristic.CurrentTemperature, command);
             }
         });
     }
-    async getRotationSpeedCharacteristic() {
-        return this.acStates.fan;
+    getTargetTemperature() {
+        return this.acStates.temperature;
     }
-    async setRotationSpeedCharacteristic(value) {
-        //Change fan speed
-        var command = value;
-        this.tuya.sendACCommand(this.parentId, this.accessory.context.device.id, "wind", command, (body) => {
+    setHeatingCoolingState(value) {
+        const val = value;
+        let command = 2;
+        if (val == this.platform.Characteristic.TargetHeaterCoolerState.COOL)
+            command = 0;
+        if (val == this.platform.Characteristic.TargetHeaterCoolerState.HEAT)
+            command = 1;
+        this.sendACCommand(this.parentId, this.accessory.context.device.id, "mode", command, (body) => {
             if (!body.success) {
-                this.platform.log.error(`Failed to change AC fan due to error ${body.msg}`);
+                this.log.error(`Failed to change AC mode due to error ${body.msg}`);
             }
             else {
-                this.platform.log.info(`${this.accessory.displayName} Fan is set to ${command == 0 ? "auto" : command}.`);
+                this.log.info(`${this.accessory.displayName} mode is ${this.modeList[command]}`);
+                this.acStates.mode = val;
+            }
+        });
+    }
+    getHeatingCoolingState() {
+        return this.acStates.mode;
+    }
+    getCoolingThresholdTemperatureCharacteristic() {
+        return this.acStates.temperature;
+    }
+    setCoolingThresholdTemperatureCharacteristic(value) {
+        const command = value;
+        this.sendACCommand(this.parentId, this.accessory.context.device.id, "temp", command, (body) => {
+            if (!body.success) {
+                this.log.error(`Failed to change AC temperature due to error ${body.msg}`);
+            }
+            else {
+                this.log.info(`${this.accessory.displayName} temperature is set to ${command} degrees.`);
+                this.acStates.temperature = command;
+                this.service.updateCharacteristic(this.platform.Characteristic.CurrentTemperature, command);
+            }
+        });
+    }
+    getRotationSpeedCharacteristic() {
+        return this.acStates.fan;
+    }
+    setRotationSpeedCharacteristic(value) {
+        //Change fan speed
+        const command = value;
+        this.sendACCommand(this.parentId, this.accessory.context.device.id, "wind", command, (body) => {
+            if (!body.success) {
+                this.log.error(`Failed to change AC fan due to error ${body.msg}`);
+            }
+            else {
+                this.log.info(`${this.accessory.displayName} Fan is set to ${command == 0 ? "auto" : command}.`);
                 this.acStates.fan = command;
             }
         });
     }
-    async getCurrentTemperature() {
+    getCurrentTemperature() {
         return this.acStates.temperature;
+    }
+    sendACCommand(deviceId, remoteId, command, value, cb) {
+        const commandObj = {
+            "code": command,
+            "value": value
+        };
+        this.log.debug(JSON.stringify(commandObj));
+        APIInvocationHelper_1.APIInvocationHelper.invokeTuyaIrApi(this.log, this.configuration, this.configuration.apiHost + `/v1.0/infrareds/${deviceId}/air-conditioners/${remoteId}/command`, "POST", commandObj, (body) => {
+            cb(body);
+        });
+    }
+    getACStatus(deviceId, remoteId, cb) {
+        this.log.debug("Getting AC Status");
+        APIInvocationHelper_1.APIInvocationHelper.invokeTuyaIrApi(this.log, this.configuration, this.configuration.apiHost + `/v2.0/infrareds/${deviceId}/remotes/${remoteId}/ac/status`, "GET", {}, (body) => {
+            cb(body);
+        });
     }
 }
 exports.AirConditionerAccessory = AirConditionerAccessory;
