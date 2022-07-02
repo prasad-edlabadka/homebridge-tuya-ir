@@ -2,7 +2,7 @@
   "private": false,
   "displayName": "Homebridge Tuya IR Platform",
   "name": "homebridge-tuya-ir",
-  "version": "0.2.1",
+  "version": "1.0.0",
   "description": "Allows homebridge to control Tuya IR Blaster based devices",
   "license": "Apache-2.0",
   "repository": {
@@ -13,8 +13,8 @@
     "url": "https://github.com/prasad-edlabadka/homebridge-tuya-ir/issues"
   },
   "funding": {
-    "type" : "paypal",
-    "url" : "https://paypal.me/prasadedlabadkar"
+    "type": "paypal",
+    "url": "https://paypal.me/prasadedlabadkar"
   },
   "engines": {
     "node": ">=14.19.0",
