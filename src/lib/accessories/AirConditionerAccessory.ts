@@ -52,6 +52,11 @@ export class AirConditionerAccessory extends BaseAccessory {
             .onGet(this.getCoolingThresholdTemperatureCharacteristic.bind(this))
             .onSet(this.setCoolingThresholdTemperatureCharacteristic.bind(this));
 
+        this.service.getCharacteristic(this.platform.Characteristic.HeatingThresholdTemperature)
+            .onGet(this.getCoolingThresholdTemperatureCharacteristic.bind(this))
+            .onSet(this.setCoolingThresholdTemperatureCharacteristic.bind(this))
+            .setProps({ unit: undefined, minValue: 17, maxValue: 30, minStep: 1, })
+
         this.service.getCharacteristic(this.platform.Characteristic.RotationSpeed)
             .setProps({
                 unit: undefined,
