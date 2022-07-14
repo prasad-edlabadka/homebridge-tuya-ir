@@ -8,7 +8,14 @@ class DeviceConfigurationHelper extends BaseHelper_1.BaseHelper {
         super(config, log);
     }
     static Instance(config, log) {
-        return this._instance || (this._instance = new this(config, log));
+        if (this._instance) {
+            this._instance.config = config;
+            this._instance.log = log;
+        }
+        else {
+            this._instance = new this(config, log);
+        }
+        return this._instance;
     }
     fetchDevices(deviceId) {
         return new Promise((resolve) => {

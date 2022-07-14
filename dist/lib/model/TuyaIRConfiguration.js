@@ -12,7 +12,9 @@ class TuyaIRConfiguration {
         this.autoFetchRemotesFromServer = true;
         this.configuredRemotes = [];
         this.apiHost = "";
-        Object.assign(this, config);
+        this.tuyaAPIClientId = config.tuyaAPIClientId;
+        this.tuyaAPISecret = config.tuyaAPISecret;
+        this.deviceRegion = config.deviceRegion;
         this.irDeviceId = config.smartIR[index].deviceId;
         this.autoFetchRemotesFromServer = config.smartIR[index].autoFetchRemotesFromServer;
         this.configuredRemotes = (_a = config.smartIR[index].configuredRemotes) === null || _a === void 0 ? void 0 : _a.map(v => new Device_1.Device(v));

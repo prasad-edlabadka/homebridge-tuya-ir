@@ -13,7 +13,7 @@ export class TuyaIRDiscovery extends EventEmitter {
     }
 
     startDiscovery(index, cb) {
-        this.log.info(`Trying to login...`);
+        this.log.info(`Trying to login for index ${index}...`);
         const configuration = new TuyaIRConfiguration(this.platformConfig, index);
         const loginHelper = LoginHelper.Instance(configuration, this.log);
         const deviceConfigHelper = DeviceConfigurationHelper.Instance(configuration, this.log);

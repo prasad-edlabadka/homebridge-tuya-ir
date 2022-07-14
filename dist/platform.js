@@ -29,6 +29,7 @@ class TuyaIRPlatform {
         this.accessories = [];
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         this.cachedAccessories = new Map();
+        this.foundAccessories = [];
         this.log.debug('Finished initializing platform:', this.config.name);
         // When this event is fired it means Homebridge has restored all cached accessories from disk.
         // Dynamic Platform plugins should only register new accessories after this event was fired,
@@ -67,9 +68,8 @@ class TuyaIRPlatform {
         this.discover(tuya, 0, this.config.smartIR.length);
     }
     discover(tuya, i, total) {
+        this.log.info(`Starting discovery for device number ${i}`);
         tuya.startDiscovery(i, (devices, index) => {
-            this.log.debug(JSON.stringify(devices));
-            let foundAccessories = [];
             //loop over the discovered devices and register each one if it has not already been registered
             for (const device of devices) {
                 if (device) {
@@ -91,7 +91,7 @@ class TuyaIRPlatform {
                         // create the accessory handler for the restored accessory
                         // this is imported from `platformAccessory.ts`
                         existingAccessory.context.device = device;
-                        foundAccessories.push(existingAccessory);
+                        this.foundAccessories.push(existingAccessory);
                         if (Accessory) {
                             this.api.updatePlatformAccessories([existingAccessory]);
                             new Accessory(this, existingAccessory);
@@ -127,14 +127,16 @@ class TuyaIRPlatform {
                     }
                 }
             }
-            //Remove accessories removed from config.
-            const accessoriesToRemove = this.accessories.filter(acc => !foundAccessories.some(foundAccessory => foundAccessory.UUID === acc.UUID));
-            this.log.info(`Removing ${accessoriesToRemove.length} accessories as they are no longer configured...`);
-            this.api.unregisterPlatformAccessories(PLUGIN_NAME, PLATFORM_NAME, accessoriesToRemove);
-            foundAccessories = [];
             i++;
             if (i < total) {
                 this.discover(tuya, i, total);
+            }
+            else {
+                //Remove accessories removed from config.
+                const accessoriesToRemove = this.accessories.filter(acc => !this.foundAccessories.some(foundAccessory => foundAccessory.UUID === acc.UUID));
+                this.log.info(`Removing ${accessoriesToRemove.length} accessories as they are no longer configured...`);
+                this.api.unregisterPlatformAccessories(PLUGIN_NAME, PLATFORM_NAME, accessoriesToRemove);
+                this.foundAccessories.splice(0, this.foundAccessories.length);
             }
         });
     }

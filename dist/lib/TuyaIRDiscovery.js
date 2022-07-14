@@ -15,7 +15,7 @@ class TuyaIRDiscovery extends events_1.default {
         this.platformConfig = platformConfig;
     }
     startDiscovery(index, cb) {
-        this.log.info(`Trying to login...`);
+        this.log.info(`Trying to login for index ${index}...`);
         const configuration = new TuyaIRConfiguration_1.TuyaIRConfiguration(this.platformConfig, index);
         const loginHelper = LoginHelper_1.LoginHelper.Instance(configuration, this.log);
         const deviceConfigHelper = DeviceConfigurationHelper_1.DeviceConfigurationHelper.Instance(configuration, this.log);
