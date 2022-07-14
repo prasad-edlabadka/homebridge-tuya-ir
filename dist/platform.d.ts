@@ -12,6 +12,7 @@ export declare class TuyaIRPlatform implements DynamicPlatformPlugin {
     readonly Characteristic: typeof Characteristic;
     readonly accessories: PlatformAccessory[];
     cachedAccessories: Map<any, any>;
+    private readonly foundAccessories;
     constructor(log: Logger, config: PlatformConfig, api: API);
     /**
      * This function is invoked when homebridge restores cached accessories from disk at startup.

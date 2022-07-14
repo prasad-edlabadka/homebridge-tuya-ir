@@ -11,7 +11,9 @@ export class TuyaIRConfiguration {
     public apiHost = "";
 
     constructor(config: PlatformConfig, index: number) {
-        Object.assign(this, config);
+        this.tuyaAPIClientId = config.tuyaAPIClientId;
+        this.tuyaAPISecret = config.tuyaAPISecret;
+        this.deviceRegion = config.deviceRegion;
         this.irDeviceId = config.smartIR[index].deviceId;
         this.autoFetchRemotesFromServer = config.smartIR[index].autoFetchRemotesFromServer;
         this.configuredRemotes = config.smartIR[index].configuredRemotes?.map(v => new Device(v));

@@ -12,7 +12,13 @@ export class DeviceConfigurationHelper extends BaseHelper {
     }
 
     public static Instance(config: TuyaIRConfiguration, log: Logger) {
-        return this._instance || (this._instance = new this(config, log));
+        if(this._instance) {
+            this._instance.config = config;
+            this._instance.log = log;
+        } else {
+            this._instance = new this(config, log);
+        }
+        return this._instance;
     }
 
     fetchDevices(deviceId: string) {
