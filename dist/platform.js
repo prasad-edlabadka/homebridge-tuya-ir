@@ -77,7 +77,7 @@ class TuyaIRPlatform {
                     // something globally unique, but constant, for example, the device serial
                     // number or MAC address
                     device.ir_id = this.config.smartIR[index].deviceId;
-                    const Accessory = CLASS_DEF[device.category] || GenericAccessory_1.GenericAccessory;
+                    const Accessory = CLASS_DEF[device.category] || (device.diy ? DoItYourselfAccessory_1.DoItYourselfAccessory : GenericAccessory_1.GenericAccessory);
                     const uuid = this.api.hap.uuid.generate(device.id);
                     // see if an accessory with the same uuid has already been registered and restored from
                     // the cached devices we stored in the `configureAccessory` method above

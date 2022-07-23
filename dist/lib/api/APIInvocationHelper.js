@@ -16,7 +16,7 @@ class APIInvocationHelper {
         return this.calculateSign(url, config, "GET", timestamp, false);
     }
     static invokeTuyaIrApi(log, config, endpoint, method, body, callback) {
-        log.debug(`Calling endpoint ${endpoint}`);
+        log.debug(`Calling endpoint ${endpoint} with payload ${JSON.stringify(body)}`);
         const timestamp = new Date().getTime();
         const accessToken = LoginHelper_1.LoginHelper.Instance(config, log).getAccessToken();
         const emptyBodyForGet = method === "GET" ? "" : JSON.stringify(body);

@@ -27,5 +27,6 @@ export declare class FanAccessory extends BaseAccessory {
     private sendFanCommand;
     private getIRCodeFromKey;
     private getIRCodesFromAPIResponse;
+    private getStandardIRCodesFromAPIResponse;
 }
 //# sourceMappingURL=FanAccessory.d.ts.map
