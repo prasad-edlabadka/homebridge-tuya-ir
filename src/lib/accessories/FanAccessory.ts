@@ -54,6 +54,7 @@ export class FanAccessory extends BaseAccessory {
 
         this.getFanCommands(this.parentId, accessory.context.device.id, accessory.context.device.diy, (commands) => {
             if (commands) {
+                this.log.debug(`Setting DIY Commands for Fan as ${JSON.stringify(commands)}`)
                 this.powerCommand = commands.power;
                 this.speedCommand = commands.speed;
                 this.swingCommand = commands.swing;
@@ -123,7 +124,7 @@ export class FanAccessory extends BaseAccessory {
                     this.log.debug("Received codes. Returning all available codes");
                     callback(this.getIRCodesFromAPIResponse(codesBody));
                 } else {
-                    this.log.error("Failed to invoke API", codesBody.msg);
+                    this.log.error("Failed to get codes for DIY Fan", codesBody.msg);
                     callback();
                 }
             });
@@ -137,12 +138,12 @@ export class FanAccessory extends BaseAccessory {
                             this.log.debug("Received codes. Returning all available codes");
                             callback(this.getIRCodesFromAPIResponse(codesBody));
                         } else {
-                            this.log.error("Failed to invoke API", codesBody.msg);
-                            callback();
+                            this.log.warn("Failed to get custom codes for fan. Trying to use standard codes...", codesBody.msg);
+                            callback(this.getStandardIRCodesFromAPIResponse(body));
                         }
                     });
                 } else {
-                    this.log.error("Failed to invoke API", body.msg);
+                    this.log.error("Failed to get fan key details", body.msg);
                     callback();
                 }
             });
@@ -158,7 +159,7 @@ export class FanAccessory extends BaseAccessory {
 
     private getIRCodeFromKey(item, key: string) {
         if (item.key_name === key) {
-            return item.key;
+            return item.key_id || item.key;
         }
     }
 
@@ -166,6 +167,17 @@ export class FanAccessory extends BaseAccessory {
         const ret = { power: null, speed: null, swing: null };
         for (let i = 0; i < apiResponse.result.length; i++) {
             const codeItem = apiResponse.result[i];
+            ret.power = ret.power || this.getIRCodeFromKey(codeItem, "power");
+            ret.speed = ret.speed || this.getIRCodeFromKey(codeItem, "fan_speed");
+            ret.swing = ret.swing || this.getIRCodeFromKey(codeItem, "swing");
+        }
+        return ret;
+    }
+
+    private getStandardIRCodesFromAPIResponse(apiResponse) {
+        const ret = { power: null, speed: null, swing: null };
+        for (let i = 0; i < apiResponse.result.key_list.length; i++) {
+            const codeItem = apiResponse.result.key_list[i];
             ret.power = ret.power || this.getIRCodeFromKey(codeItem, "power");
             ret.speed = ret.speed || this.getIRCodeFromKey(codeItem, "fan_speed");
             ret.swing = ret.swing || this.getIRCodeFromKey(codeItem, "swing");

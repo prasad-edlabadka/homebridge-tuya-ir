@@ -15,7 +15,7 @@ export class APIInvocationHelper {
     }
 
     public static invokeTuyaIrApi(log: Logger, config: TuyaIRConfiguration, endpoint: string, method: string, body: object, callback) {
-        log.debug(`Calling endpoint ${endpoint}`);
+        log.debug(`Calling endpoint ${endpoint} with payload ${JSON.stringify(body)}`);
         const timestamp = new Date().getTime();
         const accessToken = LoginHelper.Instance(config, log).getAccessToken();
         const emptyBodyForGet = method === "GET"?"":JSON.stringify(body);
