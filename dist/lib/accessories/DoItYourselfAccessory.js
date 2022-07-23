@@ -62,6 +62,7 @@ class DoItYourselfAccessory extends BaseAccessory_1.BaseAccessory {
     fetchLearningCodes(deviceId, remoteId, cb) {
         this.log.debug("Getting Learning Codes");
         APIInvocationHelper_1.APIInvocationHelper.invokeTuyaIrApi(this.log, this.configuration, this.configuration.apiHost + `/v2.0/infrareds/${deviceId}/remotes/${remoteId}/learning-codes`, "GET", {}, (body) => {
+            this.log.debug(`Received learning codes ${JSON.stringify(body)}`);
             cb(body);
         });
     }

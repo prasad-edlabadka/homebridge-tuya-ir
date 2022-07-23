@@ -87,7 +87,7 @@ export class TuyaIRPlatform implements DynamicPlatformPlugin {
           // something globally unique, but constant, for example, the device serial
           // number or MAC address
           device.ir_id = this.config.smartIR[index].deviceId;
-          const Accessory = CLASS_DEF[device.category] || GenericAccessory;
+          const Accessory = CLASS_DEF[device.category] || (device.diy?DoItYourselfAccessory:GenericAccessory);
           const uuid = this.api.hap.uuid.generate(device.id);
 
           // see if an accessory with the same uuid has already been registered and restored from
