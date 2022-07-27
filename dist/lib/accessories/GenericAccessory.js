@@ -44,7 +44,7 @@ class GenericAccessory extends BaseAccessory_1.BaseAccessory {
         return this.switchStates.On;
     }
     sendCommand(command, cb) {
-        const commandObj = { 'code': command };
+        const commandObj = { 'raw_key': command };
         APIInvocationHelper_1.APIInvocationHelper.invokeTuyaIrApi(this.log, this.configuration, this.sendCommandAPIURL, "POST", commandObj, (body) => {
             cb(body);
         });
