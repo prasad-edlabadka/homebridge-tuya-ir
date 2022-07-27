@@ -15,12 +15,17 @@ class AirConditionerAccessory extends BaseAccessory_1.BaseAccessory {
         this.platform = platform;
         this.accessory = accessory;
         this.modeList = ['Cool', 'Heat', 'Auto'];
+        this.modeCode = [];
         this.acStates = {
             On: false,
             temperature: 16,
             fan: 0,
             mode: 0
         };
+        this.modeCode = [];
+        this.modeCode.push(this.platform.Characteristic.TargetHeaterCoolerState.COOL);
+        this.modeCode.push(this.platform.Characteristic.TargetHeaterCoolerState.HEAT);
+        this.modeCode.push(this.platform.Characteristic.TargetHeaterCoolerState.AUTO);
         (_a = this.accessory.getService(this.platform.Service.AccessoryInformation)) === null || _a === void 0 ? void 0 : _a.setCharacteristic(this.platform.Characteristic.Manufacturer, accessory.context.device.brand || 'Unknown').setCharacteristic(this.platform.Characteristic.Model, accessory.context.device.model || 'Unknown').setCharacteristic(this.platform.Characteristic.SerialNumber, accessory.context.device.id);
         this.service = this.accessory.getService(this.platform.Service.HeaterCooler) || this.accessory.addService(this.platform.Service.HeaterCooler);
         this.service.setCharacteristic(this.platform.Characteristic.Name, accessory.context.device.name);
@@ -64,7 +69,7 @@ class AirConditionerAccessory extends BaseAccessory_1.BaseAccessory {
             else {
                 this.log.debug(`${this.accessory.displayName} status is ${JSON.stringify(body.result)}`);
                 this.acStates.On = body.result.power === "1" ? true : false;
-                this.acStates.mode = body.result.mode;
+                this.acStates.mode = this.modeCode[body.result.mode] || this.platform.Characteristic.TargetHeaterCoolerState.AUTO;
                 this.acStates.temperature = body.result.temp;
                 this.acStates.fan = body.result.wind;
                 this.service.updateCharacteristic(this.platform.Characteristic.Active, this.acStates.On);

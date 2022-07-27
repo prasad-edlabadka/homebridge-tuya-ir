@@ -56,7 +56,7 @@ export class GenericAccessory extends BaseAccessory {
     }
 
     private sendCommand(command: string | number, cb) {
-        const commandObj = { 'code': command };
+        const commandObj = { 'raw_key': command };
         APIInvocationHelper.invokeTuyaIrApi(this.log, this.configuration, this.sendCommandAPIURL, "POST", commandObj, (body) => {
             cb(body);
         });
