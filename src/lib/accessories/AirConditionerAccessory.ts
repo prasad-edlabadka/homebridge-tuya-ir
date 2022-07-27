@@ -11,6 +11,7 @@ import { APIInvocationHelper } from '../api/APIInvocationHelper';
 export class AirConditionerAccessory extends BaseAccessory {
     private service: Service;
     private modeList = ['Cool', 'Heat', 'Auto'];
+    private modeCode: number[] =[];
 
     private acStates = {
         On: false,
@@ -24,6 +25,10 @@ export class AirConditionerAccessory extends BaseAccessory {
         private readonly accessory: PlatformAccessory,
     ) {
         super(platform, accessory);
+        this.modeCode = [];
+        this.modeCode.push(this.platform.Characteristic.TargetHeaterCoolerState.COOL);
+        this.modeCode.push(this.platform.Characteristic.TargetHeaterCoolerState.HEAT);
+        this.modeCode.push(this.platform.Characteristic.TargetHeaterCoolerState.AUTO);
 
         this.accessory.getService(this.platform.Service.AccessoryInformation)
             ?.setCharacteristic(this.platform.Characteristic.Manufacturer, accessory.context.device.brand || 'Unknown')
@@ -78,7 +83,7 @@ export class AirConditionerAccessory extends BaseAccessory {
             } else {
                 this.log.debug(`${this.accessory.displayName} status is ${JSON.stringify(body.result)}`);
                 this.acStates.On = body.result.power === "1" ? true : false;
-                this.acStates.mode = body.result.mode as number;
+                this.acStates.mode = this.modeCode[body.result.mode as number] || this.platform.Characteristic.TargetHeaterCoolerState.AUTO;
                 this.acStates.temperature = body.result.temp as number;
                 this.acStates.fan = body.result.wind as number;
                 this.service.updateCharacteristic(this.platform.Characteristic.Active, this.acStates.On);
