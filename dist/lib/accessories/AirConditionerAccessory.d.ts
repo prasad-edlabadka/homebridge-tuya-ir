@@ -14,6 +14,7 @@ export declare class AirConditionerAccessory extends BaseAccessory {
     private modeCode;
     private acStates;
     constructor(platform: TuyaIRPlatform, accessory: PlatformAccessory);
+    getTemperatureRange(): void;
     /**
     * Load latest device status.
     */

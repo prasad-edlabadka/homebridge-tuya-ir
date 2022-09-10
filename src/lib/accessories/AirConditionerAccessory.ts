@@ -11,7 +11,7 @@ import { APIInvocationHelper } from '../api/APIInvocationHelper';
 export class AirConditionerAccessory extends BaseAccessory {
     private service: Service;
     private modeList = ['Cool', 'Heat', 'Auto'];
-    private modeCode: number[] =[];
+    private modeCode: number[] = [];
 
     private acStates = {
         On: false,
@@ -49,16 +49,12 @@ export class AirConditionerAccessory extends BaseAccessory {
             .onGet(this.getCurrentTemperature.bind(this));
 
         this.service.getCharacteristic(this.platform.Characteristic.CoolingThresholdTemperature)
-            .setProps({
-                minStep: 1
-            })
             .onGet(this.getCoolingThresholdTemperatureCharacteristic.bind(this))
             .onSet(this.setCoolingThresholdTemperatureCharacteristic.bind(this));
 
         this.service.getCharacteristic(this.platform.Characteristic.HeatingThresholdTemperature)
             .onGet(this.getCoolingThresholdTemperatureCharacteristic.bind(this))
             .onSet(this.setCoolingThresholdTemperatureCharacteristic.bind(this))
-            .setProps({ minStep: 1 })
 
         this.service.getCharacteristic(this.platform.Characteristic.RotationSpeed)
             .setProps({
@@ -70,9 +66,33 @@ export class AirConditionerAccessory extends BaseAccessory {
             .onGet(this.getRotationSpeedCharacteristic.bind(this))
             .onSet(this.setRotationSpeedCharacteristic.bind(this));
         this.refreshStatus();
+        this.getTemperatureRange();
     }
 
 
+    getTemperatureRange() {
+        APIInvocationHelper.invokeTuyaIrApi(this.log, this.configuration, `${this.configuration.apiHost}/v1.0/iot-03/devices/${this.accessory.context.device.id}/specification`, "GET", {}, (body) => {
+            if (!body.success) {
+                this.log.error(`Failed to get AC temperature range. Using defaults. ${body.msg}`);
+            } else {
+                const temperatureConfig = JSON.parse(body.result.functions.filter(v => v.code === "T")[0].values);
+                this.service.getCharacteristic(this.platform.Characteristic.CoolingThresholdTemperature)
+                    .setProps({
+                        minValue: temperatureConfig.min,
+                        maxValue: temperatureConfig.max,
+                        minStep: temperatureConfig.step
+                    })
+                this.service.getCharacteristic(this.platform.Characteristic.HeatingThresholdTemperature)
+                    .setProps({
+                        minValue: temperatureConfig.min,
+                        maxValue: temperatureConfig.max,
+                        minStep: temperatureConfig.step
+                    })
+                this.log.debug("Minimum Temperature: " + temperatureConfig.min);
+                this.log.debug("Maximum Temperature: " + temperatureConfig.max);
+            }
+        });
+    }
     /**
     * Load latest device status. 
     */
@@ -177,7 +197,7 @@ export class AirConditionerAccessory extends BaseAccessory {
             "value": value
         }
         this.log.debug(JSON.stringify(commandObj));
-        APIInvocationHelper.invokeTuyaIrApi(this.log, this.configuration, this.configuration.apiHost + `/v1.0/infrareds/${deviceId}/air-conditioners/${remoteId}/command`, "POST", commandObj, (body) => {
+        APIInvocationHelper.invokeTuyaIrApi(this.log, this.configuration, this.configuration.apiHost + `/v2.0/infrareds/${deviceId}/air-conditioners/${remoteId}/command`, "POST", commandObj, (body) => {
             cb(body);
         })
     }
