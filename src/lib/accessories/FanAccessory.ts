@@ -29,7 +29,7 @@ export class FanAccessory extends BaseAccessory {
         private readonly accessory: PlatformAccessory,
     ) {
         super(platform, accessory);
-        this.sendCommandAPIURL = accessory.context.device.diy ? `${this.configuration.apiHost}/v2.0/infrareds/${this.parentId}/remotes/${accessory.context.device.id}/learning-codes` : `${this.configuration.apiHost}/v2.0/infrareds/${this.parentId}/remotes/${accessory.context.device.id}/raw/command`;
+        this.sendCommandAPIURL = accessory.context.device.diy ? `${this.configuration.apiHost}/v2.0/infrareds/${this.parentId}/remotes/${accessory.context.device.id}/learning-codes` : `${this.configuration.apiHost}/v1.0/infrareds/${this.parentId}/remotes/${accessory.context.device.id}/raw/command`;
         this.sendCommandKey = accessory.context.device.diy ? 'code' : 'raw_key';
 
         this.accessory?.getService(this.platform.Service.AccessoryInformation)

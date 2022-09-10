@@ -22,7 +22,7 @@ export class GenericAccessory extends BaseAccessory {
         private readonly accessory: PlatformAccessory,
     ) {
         super(platform, accessory);
-        this.sendCommandAPIURL = `${this.configuration.apiHost}/v2.0/infrareds/${this.parentId}/remotes/${accessory.context.device.id}/raw/command`;
+        this.sendCommandAPIURL = `${this.configuration.apiHost}/v1.0/infrareds/${this.parentId}/remotes/${accessory.context.device.id}/raw/command`;
         
         // set accessory information
         this.accessory.getService(this.platform.Service.AccessoryInformation)
