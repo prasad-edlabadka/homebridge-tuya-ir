@@ -38,7 +38,7 @@ export class DeviceConfigurationHelper extends BaseHelper {
         const devs: unknown[] = [];
         for (let i = 0; i < this.config.configuredRemotes.length; i++) {
             const dev = this.config.configuredRemotes[i];
-            this.fetchRemoteDetails(dev.id, (device) => {
+            this.fetchRemoteDetails(this.config.irDeviceId, dev.id, (device) => {
                 device.config = this.config;
                 device.diy = dev.diy;
                 devs.push(device);
@@ -50,12 +50,12 @@ export class DeviceConfigurationHelper extends BaseHelper {
     }
 
     private autoFetch(deviceId, cb) {
-        APIInvocationHelper.invokeTuyaIrApi(this.log, this.config, `${this.apiHost}/v1.0/infrareds/${deviceId}/remotes`, "GET", {}, (body) => {
+        APIInvocationHelper.invokeTuyaIrApi(this.log, this.config, `${this.apiHost}/v2.0/infrareds/${deviceId}/remotes`, "GET", {}, (body) => {
             const devs: unknown[] = [];
             if (body.success && body.result) {
                 this.log.info(`API returned ${body.result.length} remotes...`);
                 for (let i = 0; i < body.result.length; i++) {
-                    this.fetchRemoteDetails(body.result[i].remote_id, (device) => {
+                    this.fetchRemoteDetails(deviceId, body.result[i].remote_id, (device) => {
                         device.config = this.config;
                         devs.push(device);
                         if (devs.length == body.result.length) {
@@ -70,7 +70,7 @@ export class DeviceConfigurationHelper extends BaseHelper {
         })
     }
 
-    private fetchRemoteDetails(id, callback) {
+    private fetchRemoteDetails(irId, id, callback) {
         this.log.warn(this.apiHost + `/v1.0/devices/${id}`);
         APIInvocationHelper.invokeTuyaIrApi(this.log, this.config, this.apiHost + `/v1.0/devices/${id}`, "GET", {}, (body) => {
             if (body.success) {

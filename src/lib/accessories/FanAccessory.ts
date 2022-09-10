@@ -29,7 +29,7 @@ export class FanAccessory extends BaseAccessory {
         private readonly accessory: PlatformAccessory,
     ) {
         super(platform, accessory);
-        this.sendCommandAPIURL = accessory.context.device.diy ? `${this.configuration.apiHost}/v1.0/infrareds/${this.parentId}/remotes/${accessory.context.device.id}/learning-codes` : `${this.configuration.apiHost}/v1.0/infrareds/${this.parentId}/remotes/${accessory.context.device.id}/raw/command`;
+        this.sendCommandAPIURL = accessory.context.device.diy ? `${this.configuration.apiHost}/v2.0/infrareds/${this.parentId}/remotes/${accessory.context.device.id}/learning-codes` : `${this.configuration.apiHost}/v2.0/infrareds/${this.parentId}/remotes/${accessory.context.device.id}/raw/command`;
         this.sendCommandKey = accessory.context.device.diy ? 'code' : 'raw_key';
 
         this.accessory?.getService(this.platform.Service.AccessoryInformation)
@@ -119,7 +119,7 @@ export class FanAccessory extends BaseAccessory {
         this.log.debug("Getting commands for Fan...");
         if (isDiy) {
             this.log.debug("Getting commands for DIY Fan...");
-            APIInvocationHelper.invokeTuyaIrApi(this.log, this.configuration, this.configuration.apiHost + `/v1.0/infrareds/${irDeviceId}/remotes/${remoteId}/learning-codes`, "GET", {}, (codesBody) => {
+            APIInvocationHelper.invokeTuyaIrApi(this.log, this.configuration, this.configuration.apiHost + `/v2.0/infrareds/${irDeviceId}/remotes/${remoteId}/learning-codes`, "GET", {}, (codesBody) => {
                 if (codesBody.success) {
                     this.log.debug("Received codes. Returning all available codes");
                     callback(this.getIRCodesFromAPIResponse(codesBody));
@@ -130,10 +130,10 @@ export class FanAccessory extends BaseAccessory {
             });
         } else {
             this.log.debug("First getting brand id and remote id for given device...");
-            APIInvocationHelper.invokeTuyaIrApi(this.log, this.configuration, `${this.configuration.apiHost}/v1.0/infrareds/${irDeviceId}/remotes/${remoteId}/keys`, 'GET', {}, (body) => {
+            APIInvocationHelper.invokeTuyaIrApi(this.log, this.configuration, `${this.configuration.apiHost}/v2.0/infrareds/${irDeviceId}/remotes/${remoteId}/keys`, 'GET', {}, (body) => {
                 if (body.success) {
                     this.log.debug(`Found category id: ${body.result.category_id}, brand id: ${body.result.brand_id}, remote id: ${body.result.remote_index}`);
-                    APIInvocationHelper.invokeTuyaIrApi(this.log, this.configuration, this.configuration.apiHost + `/v1.0/infrareds/${irDeviceId}/categories/${body.result.category_id}/brands/${body.result.brand_id}/remotes/${body.result.remote_index}/rules`, "GET", {}, (codesBody) => {
+                    APIInvocationHelper.invokeTuyaIrApi(this.log, this.configuration, this.configuration.apiHost + `/v2.0/infrareds/${irDeviceId}/categories/${body.result.category_id}/brands/${body.result.brand_id}/remotes/${body.result.remote_index}/rules`, "GET", {}, (codesBody) => {
                         if (codesBody.success) {
                             this.log.debug("Received codes. Returning all available codes");
                             callback(this.getIRCodesFromAPIResponse(codesBody));
