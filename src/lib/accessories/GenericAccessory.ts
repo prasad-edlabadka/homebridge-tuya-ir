@@ -42,7 +42,7 @@ export class GenericAccessory extends BaseAccessory {
         if (this.switchStates.On != (value as number)) {
             this.sendCommand(this.powerCommand, (body) => {
                 if (!body.success) {
-                    this.log.error(`Failed to change device status due to error ${body.msg}`);
+                    this.log.error(`Failed to change ${this.accessory.displayName} status due to error ${body.msg}`);
                 } else {
                     this.log.info(`${this.accessory.displayName} is now ${(value as number) == 0 ? 'Off' : 'On'}`);
                     this.switchStates.On = value as number;

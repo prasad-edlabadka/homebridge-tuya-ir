@@ -39,7 +39,7 @@ export class DoItYourselfAccessory extends BaseAccessory {
                 }
 
                 for(const code of this.accessory.context.device.codes){
-                    this.log.info(`Adding code ${code.key_name}`);
+                    this.log.debug(`Adding code ${code.key_name}`);
                     const service = this.accessory.getService(this.platform.api.hap.uuid.generate(code.key_name)) || accessory.addService(this.platform.api.hap.Service.Switch, code.key_name, this.platform.api.hap.uuid.generate(code.key_name), code.key);
                     service.getCharacteristic(this.platform.Characteristic.On)
                         .onGet(() => {

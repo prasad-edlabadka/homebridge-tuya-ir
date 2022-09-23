@@ -23,7 +23,7 @@ class LoginHelper extends BaseHelper_1.BaseHelper {
     login() {
         return new Promise((resolve, reject) => {
             const LOGIN_URI = "/v1.0/token?grant_type=1";
-            this.log.info(`Logging in to the the server ${this.apiHost}...`);
+            this.log.debug(`Logging in to the the server ${this.apiHost}...`);
             this.invokeTuyaLoginAPI(this.apiHost + LOGIN_URI, (body) => {
                 if (body.success) {
                     this.extractAccessTokenFromAPIResponse(body);
@@ -51,14 +51,14 @@ class LoginHelper extends BaseHelper_1.BaseHelper {
                 'nonce': ''
             }
         };
-        this.log.info(JSON.stringify(options));
+        this.log.debug(JSON.stringify(options));
         https_1.default.get(endpoint, options, (incomingMsg) => {
             let body = '';
             incomingMsg.on('data', (chunk) => {
                 body += chunk;
             });
             incomingMsg.on('end', () => {
-                this.log.info(body);
+                this.log.debug(body);
                 if (incomingMsg.statusCode != 200) {
                     this.log.error("Api call failed with response code " + incomingMsg.statusCode);
                 }

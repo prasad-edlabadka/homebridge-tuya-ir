@@ -57,26 +57,36 @@ class AirConditionerAccessory extends BaseAccessory_1.BaseAccessory {
     }
     getTemperatureRange() {
         APIInvocationHelper_1.APIInvocationHelper.invokeTuyaIrApi(this.log, this.configuration, `${this.configuration.apiHost}/v1.0/iot-03/devices/${this.accessory.context.device.id}/specification`, "GET", {}, (body) => {
-            if (!body.success) {
-                this.log.error(`Failed to get AC temperature range. Using defaults. ${body.msg}`);
+            let temperatureConfig = {
+                min: 16,
+                max: 26,
+                step: 1
+            };
+            if (body.success) {
+                try {
+                    temperatureConfig = JSON.parse(body.result.functions.filter(v => v.code === "T")[0].values);
+                }
+                catch (e) {
+                    this.log.error(`Failed to parse AC temperature range due to error ${e}. Using defaults.`);
+                }
             }
             else {
-                const temperatureConfig = JSON.parse(body.result.functions.filter(v => v.code === "T")[0].values);
-                this.service.getCharacteristic(this.platform.Characteristic.CoolingThresholdTemperature)
-                    .setProps({
-                    minValue: temperatureConfig.min,
-                    maxValue: temperatureConfig.max,
-                    minStep: temperatureConfig.step
-                });
-                this.service.getCharacteristic(this.platform.Characteristic.HeatingThresholdTemperature)
-                    .setProps({
-                    minValue: temperatureConfig.min,
-                    maxValue: temperatureConfig.max,
-                    minStep: temperatureConfig.step
-                });
-                this.log.debug("Minimum Temperature: " + temperatureConfig.min);
-                this.log.debug("Maximum Temperature: " + temperatureConfig.max);
+                this.log.error(`Failed to get AC temperature range. Using defaults. ${body.msg}`);
             }
+            this.service.getCharacteristic(this.platform.Characteristic.CoolingThresholdTemperature)
+                .setProps({
+                minValue: temperatureConfig.min,
+                maxValue: temperatureConfig.max,
+                minStep: temperatureConfig.step
+            });
+            this.service.getCharacteristic(this.platform.Characteristic.HeatingThresholdTemperature)
+                .setProps({
+                minValue: temperatureConfig.min,
+                maxValue: temperatureConfig.max,
+                minStep: temperatureConfig.step
+            });
+            this.log.debug("Minimum Temperature: " + temperatureConfig.min);
+            this.log.debug("Maximum Temperature: " + temperatureConfig.max);
         });
     }
     /**
@@ -107,7 +117,7 @@ class AirConditionerAccessory extends BaseAccessory_1.BaseAccessory {
         const command = value ? 1 : 0;
         this.sendACCommand(this.parentId, this.accessory.context.device.id, "power", command, (body) => {
             if (!body.success) {
-                this.log.error(`Failed to change AC status due to error ${body.msg}`);
+                this.log.error(`Failed to change status of ${this.accessory.displayName} due to error ${body.msg}`);
             }
             else {
                 this.log.info(`${this.accessory.displayName} is now ${command == 0 ? 'Off' : 'On'}`);
@@ -127,7 +137,7 @@ class AirConditionerAccessory extends BaseAccessory_1.BaseAccessory {
             command = 1;
         this.sendACCommand(this.parentId, this.accessory.context.device.id, "mode", command, (body) => {
             if (!body.success) {
-                this.log.error(`Failed to change AC mode due to error ${body.msg}`);
+                this.log.error(`Failed to change ${this.accessory.displayName} mode due to error ${body.msg}`);
             }
             else {
                 this.log.info(`${this.accessory.displayName} mode is ${this.modeList[command]}`);
@@ -145,7 +155,7 @@ class AirConditionerAccessory extends BaseAccessory_1.BaseAccessory {
         const command = value;
         this.sendACCommand(this.parentId, this.accessory.context.device.id, "temp", command, (body) => {
             if (!body.success) {
-                this.log.error(`Failed to change AC temperature due to error ${body.msg}`);
+                this.log.error(`Failed to change ${this.accessory.displayName} temperature due to error ${body.msg}`);
             }
             else {
                 this.log.info(`${this.accessory.displayName} temperature is set to ${command} degrees.`);
@@ -162,7 +172,7 @@ class AirConditionerAccessory extends BaseAccessory_1.BaseAccessory {
         const command = value;
         this.sendACCommand(this.parentId, this.accessory.context.device.id, "wind", command, (body) => {
             if (!body.success) {
-                this.log.error(`Failed to change AC fan due to error ${body.msg}`);
+                this.log.error(`Failed to change ${this.accessory.displayName} fan due to error ${body.msg}`);
             }
             else {
                 this.log.info(`${this.accessory.displayName} Fan is set to ${command == 0 ? "auto" : command}.`);

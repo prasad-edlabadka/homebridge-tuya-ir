@@ -31,7 +31,7 @@ class GenericAccessory extends BaseAccessory_1.BaseAccessory {
         if (this.switchStates.On != value) {
             this.sendCommand(this.powerCommand, (body) => {
                 if (!body.success) {
-                    this.log.error(`Failed to change device status due to error ${body.msg}`);
+                    this.log.error(`Failed to change ${this.accessory.displayName} status due to error ${body.msg}`);
                 }
                 else {
                     this.log.info(`${this.accessory.displayName} is now ${value == 0 ? 'Off' : 'On'}`);

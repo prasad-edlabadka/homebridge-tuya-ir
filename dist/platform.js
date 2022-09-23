@@ -68,7 +68,7 @@ class TuyaIRPlatform {
         this.discover(tuya, 0, this.config.smartIR.length);
     }
     discover(tuya, i, total) {
-        this.log.info(`Starting discovery for device number ${i}`);
+        this.log.debug(`Starting discovery for device number ${i}`);
         tuya.startDiscovery(i, (devices, index) => {
             //loop over the discovered devices and register each one if it has not already been registered
             for (const device of devices) {
@@ -134,8 +134,10 @@ class TuyaIRPlatform {
             else {
                 //Remove accessories removed from config.
                 const accessoriesToRemove = this.accessories.filter(acc => !this.foundAccessories.some(foundAccessory => foundAccessory.UUID === acc.UUID));
-                this.log.info(`Removing ${accessoriesToRemove.length} accessories as they are no longer configured...`);
-                this.api.unregisterPlatformAccessories(PLUGIN_NAME, PLATFORM_NAME, accessoriesToRemove);
+                if (accessoriesToRemove.length > 0) {
+                    this.log.info(`Removing ${accessoriesToRemove.length} accessories as they are no longer configured...`);
+                    this.api.unregisterPlatformAccessories(PLUGIN_NAME, PLATFORM_NAME, accessoriesToRemove);
+                }
                 this.foundAccessories.splice(0, this.foundAccessories.length);
             }
         });
