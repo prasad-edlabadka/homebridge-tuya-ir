@@ -48,7 +48,7 @@ class DeviceConfigurationHelper extends BaseHelper_1.BaseHelper {
         APIInvocationHelper_1.APIInvocationHelper.invokeTuyaIrApi(this.log, this.config, `${this.apiHost}/v2.0/infrareds/${deviceId}/remotes`, "GET", {}, (body) => {
             const devs = [];
             if (body.success && body.result) {
-                this.log.info(`API returned ${body.result.length} remotes...`);
+                this.log.debug(`API returned ${body.result.length} remotes...`);
                 for (let i = 0; i < body.result.length; i++) {
                     this.fetchRemoteDetails(deviceId, body.result[i].remote_id, (device) => {
                         device.config = this.config;
@@ -66,7 +66,7 @@ class DeviceConfigurationHelper extends BaseHelper_1.BaseHelper {
         });
     }
     fetchRemoteDetails(irId, id, callback) {
-        this.log.warn(this.apiHost + `/v1.0/devices/${id}`);
+        this.log.debug(this.apiHost + `/v1.0/devices/${id}`);
         APIInvocationHelper_1.APIInvocationHelper.invokeTuyaIrApi(this.log, this.config, this.apiHost + `/v1.0/devices/${id}`, "GET", {}, (body) => {
             if (body.success) {
                 callback(body.result);

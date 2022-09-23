@@ -25,7 +25,7 @@ export class LoginHelper extends BaseHelper {
     login() {
         return new Promise((resolve, reject) => {
             const LOGIN_URI = "/v1.0/token?grant_type=1";
-            this.log.info(`Logging in to the the server ${this.apiHost}...`);
+            this.log.debug(`Logging in to the the server ${this.apiHost}...`);
             this.invokeTuyaLoginAPI(this.apiHost + LOGIN_URI, (body) => {
                 if (body.success) {
                     this.extractAccessTokenFromAPIResponse(body);
@@ -55,7 +55,7 @@ export class LoginHelper extends BaseHelper {
             }
         };
 
-        this.log.info(JSON.stringify(options))
+        this.log.debug(JSON.stringify(options))
 
         request.get(endpoint, options, (incomingMsg) => {
             let body = '';
@@ -64,7 +64,7 @@ export class LoginHelper extends BaseHelper {
             });
 
             incomingMsg.on('end', () => {
-                this.log.info(body);
+                this.log.debug(body);
                 if (incomingMsg.statusCode != 200) {
                     this.log.error("Api call failed with response code " + incomingMsg.statusCode);
                 } else {
