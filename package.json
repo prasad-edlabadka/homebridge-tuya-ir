@@ -2,7 +2,7 @@
   "private": false,
   "displayName": "Homebridge Tuya IR Platform",
   "name": "homebridge-tuya-ir",
-  "version": "1.0.9",
+  "version": "1.0.10",
   "description": "Allows homebridge to control Tuya IR Blaster based devices",
   "license": "Apache-2.0",
   "repository": {
