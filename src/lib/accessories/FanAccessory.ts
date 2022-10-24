@@ -164,7 +164,7 @@ export class FanAccessory extends BaseAccessory {
     }
 
     private getIRCodesFromAPIResponse(apiResponse) {
-        const ret = { power: null, speed: null, swing: null };
+        const ret = { power: this.powerCommand, speed: this.speedCommand, swing: this.swingCommand };
         for (let i = 0; i < apiResponse.result.length; i++) {
             const codeItem = apiResponse.result[i];
             ret.power = ret.power || this.getIRCodeFromKey(codeItem, "power");
