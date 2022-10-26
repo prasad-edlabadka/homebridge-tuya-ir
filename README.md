@@ -23,6 +23,7 @@ Control your Tuya Smart IR based devices in HomeKit. Also works with Smart Home 
 ## Supported Devices
 * Air Conditioner (Only pre-configured vendor. No DIY devices)
 * Fan (Pre-configured and DIY devices)
+* Light (Pre-configured only. No DIY). Light supports only on-off and brightness control.
 * DIY Devices. Each learned button will be added a switch.
 * All other Pre-configured remotes will be added as switch to turn them on and off only. No other feature. (No DIY devices)
 
