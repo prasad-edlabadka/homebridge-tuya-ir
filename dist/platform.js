@@ -6,12 +6,14 @@ const AirConditionerAccessory_1 = require("./lib/accessories/AirConditionerAcces
 const FanAccessory_1 = require("./lib/accessories/FanAccessory");
 const GenericAccessory_1 = require("./lib/accessories/GenericAccessory");
 const DoItYourselfAccessory_1 = require("./lib/accessories/DoItYourselfAccessory");
+const LightAccessory_1 = require("./lib/accessories/LightAccessory");
 const PLATFORM_NAME = 'TuyaIR';
 const PLUGIN_NAME = 'homebridge-tuya-ir';
 const CLASS_DEF = {
     infrared_ac: AirConditionerAccessory_1.AirConditionerAccessory,
     infrared_fan: FanAccessory_1.FanAccessory,
     qt: DoItYourselfAccessory_1.DoItYourselfAccessory,
+    infrared_light: LightAccessory_1.LightAccessory
 };
 /**
  * HomebridgePlatform
