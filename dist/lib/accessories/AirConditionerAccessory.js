@@ -9,11 +9,12 @@ const APIInvocationHelper_1 = require("../api/APIInvocationHelper");
  * Each accessory may expose multiple services of different service types.
  */
 class AirConditionerAccessory extends BaseAccessory_1.BaseAccessory {
-    constructor(platform, accessory) {
+    constructor(platform, accessory, characteristic) {
         var _a;
         super(platform, accessory);
         this.platform = platform;
         this.accessory = accessory;
+        this.characteristic = characteristic;
         this.modeList = ['Cool', 'Heat', 'Auto'];
         this.modeCode = [];
         this.acStates = {
@@ -105,8 +106,9 @@ class AirConditionerAccessory extends BaseAccessory_1.BaseAccessory {
                 this.acStates.fan = body.result.wind;
                 this.service.updateCharacteristic(this.platform.Characteristic.Active, this.acStates.On);
                 this.service.updateCharacteristic(this.platform.Characteristic.TargetHeaterCoolerState, this.acStates.mode);
-                this.service.updateCharacteristic(this.platform.Characteristic.CurrentTemperature, this.acStates.temperature);
+                this.service.updateCharacteristic(this.platform.Characteristic.CurrentTemperature, 24); //this.acStates.temperature
                 this.service.updateCharacteristic(this.platform.Characteristic.RotationSpeed, this.acStates.fan);
+                this.log.info(`N4D ${this.service.getCharacteristic(this.platform.Characteristic.CurrentTemperature)}`);
             }
             setTimeout(this.refreshStatus.bind(this), 30000);
         });
@@ -181,7 +183,8 @@ class AirConditionerAccessory extends BaseAccessory_1.BaseAccessory {
         });
     }
     getCurrentTemperature() {
-        return this.acStates.temperature;
+        let temp = this.acStates.temperature;
+        return temp;
     }
     sendACCommand(deviceId, remoteId, command, value, cb) {
         const commandObj = {

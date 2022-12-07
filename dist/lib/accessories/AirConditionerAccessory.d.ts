@@ -1,4 +1,4 @@
-import { PlatformAccessory, CharacteristicValue } from 'homebridge';
+import { PlatformAccessory, CharacteristicValue, Characteristic } from 'homebridge';
 import { TuyaIRPlatform } from '../../platform';
 import { BaseAccessory } from './BaseAccessory';
 /**
@@ -9,11 +9,12 @@ import { BaseAccessory } from './BaseAccessory';
 export declare class AirConditionerAccessory extends BaseAccessory {
     private readonly platform;
     private readonly accessory;
+    private readonly characteristic;
     private service;
     private modeList;
     private modeCode;
     private acStates;
-    constructor(platform: TuyaIRPlatform, accessory: PlatformAccessory);
+    constructor(platform: TuyaIRPlatform, accessory: PlatformAccessory, characteristic: Characteristic);
     getTemperatureRange(): void;
     /**
     * Load latest device status.

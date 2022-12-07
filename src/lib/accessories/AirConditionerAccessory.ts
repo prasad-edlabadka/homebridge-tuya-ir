@@ -1,4 +1,4 @@
-import { Service, PlatformAccessory, CharacteristicValue } from 'homebridge';
+import { Service, PlatformAccessory, CharacteristicValue, Characteristic } from 'homebridge';
 import { TuyaIRPlatform } from '../../platform';
 import { BaseAccessory } from './BaseAccessory';
 import { APIInvocationHelper } from '../api/APIInvocationHelper';
@@ -23,6 +23,7 @@ export class AirConditionerAccessory extends BaseAccessory {
     constructor(
         private readonly platform: TuyaIRPlatform,
         private readonly accessory: PlatformAccessory,
+		private readonly characteristic: Characteristic,
     ) {
         super(platform, accessory);
         this.modeCode = [];
@@ -83,7 +84,7 @@ export class AirConditionerAccessory extends BaseAccessory {
                 } catch(e) {
                     this.log.error(`Failed to parse AC temperature range due to error ${e}. Using defaults.`);
                 }
-                
+
             } else {
                 this.log.error(`Failed to get AC temperature range. Using defaults. ${body.msg}`);
             }
@@ -104,7 +105,7 @@ export class AirConditionerAccessory extends BaseAccessory {
         });
     }
     /**
-    * Load latest device status. 
+    * Load latest device status.
     */
     refreshStatus() {
         this.getACStatus(this.parentId, this.accessory.context.device.id, (body) => {
@@ -118,8 +119,11 @@ export class AirConditionerAccessory extends BaseAccessory {
                 this.acStates.fan = body.result.wind as number;
                 this.service.updateCharacteristic(this.platform.Characteristic.Active, this.acStates.On);
                 this.service.updateCharacteristic(this.platform.Characteristic.TargetHeaterCoolerState, this.acStates.mode);
-                this.service.updateCharacteristic(this.platform.Characteristic.CurrentTemperature, this.acStates.temperature);
+                this.service.updateCharacteristic(this.platform.Characteristic.CurrentTemperature, 24);//this.acStates.temperature
                 this.service.updateCharacteristic(this.platform.Characteristic.RotationSpeed, this.acStates.fan);
+
+ this.log.info(`N4D ${this.service.getCharacteristic(this.platform.Characteristic.CurrentTemperature)}`);
+
             }
             setTimeout(this.refreshStatus.bind(this), 30000);
         });
@@ -198,7 +202,9 @@ export class AirConditionerAccessory extends BaseAccessory {
     }
 
     getCurrentTemperature(): CharacteristicValue {
-        return this.acStates.temperature;
+		let temp = this.acStates.temperature;
+
+        return temp;
     }
 
     sendACCommand(deviceId: string, remoteId: string, command: string, value: string | number, cb) {
