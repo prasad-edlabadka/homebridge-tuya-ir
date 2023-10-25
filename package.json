@@ -32,7 +32,7 @@
     "homebridge-tuya-ir"
   ],
   "dependencies": {
-    "crypto-js": "^4.0.0",
+    "crypto-js": "^4.2.0",
     "escape-html": "^1.0.3",
     "http": "^0.0.1-security",
     "request": "^2.88.2"
