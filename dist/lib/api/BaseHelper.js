@@ -5,7 +5,7 @@ class BaseHelper {
     constructor(config, log) {
         this.config = config;
         this.log = log;
-        this.apiHost = `https://openapi.tuya${this.config.deviceRegion}.com`;
+        this.apiHost = this.config.apiHost;
     }
 }
 exports.BaseHelper = BaseHelper;
