@@ -14,5 +14,11 @@ export declare class APIInvocationHelper {
     static invokeTuyaIrApi(log: Logger, config: TuyaIRConfiguration, endpoint: string, method: string, body: object, callback: any): void;
     private static calculateSign;
     private static stringToSign;
+    /**
+     * Tuya error codes that indicate an invalid/expired access token.
+     * 1010 = token invalid, 1011 = token expired, 1012 = token does not exist.
+     */
+    private static readonly TOKEN_ERROR_CODES;
+    private static isTokenError;
 }
 //# sourceMappingURL=APIInvocationHelper.d.ts.map
