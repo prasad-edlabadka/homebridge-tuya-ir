@@ -22,6 +22,7 @@ class AirConditionerAccessory extends BaseAccessory_1.BaseAccessory {
             fan: 0,
             mode: 0,
         };
+        this.pollFailures = 0;
         this.modeCode = [];
         this.modeCode.push(this.platform.Characteristic.TargetHeaterCoolerState.COOL);
         this.modeCode.push(this.platform.Characteristic.TargetHeaterCoolerState.HEAT);
@@ -105,10 +106,10 @@ class AirConditionerAccessory extends BaseAccessory_1.BaseAccessory {
      */
     refreshStatus() {
         this.getACStatus(this.parentId, this.accessory.context.device.id, (body) => {
-            if (!body.success) {
-                this.log.error(`Failed to get AC status due to error ${body.msg}`);
-            }
-            else {
+            let nextPollMs;
+            if (body.success) {
+                this.pollFailures = 0;
+                nextPollMs = AirConditionerAccessory.BASE_POLL_MS;
                 this.log.debug(`${this.accessory.displayName} status is ${JSON.stringify(body.result)}`);
                 this.acStates.On = body.result.power === '1' ? true : false;
                 this.acStates.mode =
@@ -121,7 +122,13 @@ class AirConditionerAccessory extends BaseAccessory_1.BaseAccessory {
                 this.service.updateCharacteristic(this.platform.Characteristic.CurrentTemperature, this.acStates.temperature);
                 this.service.updateCharacteristic(this.platform.Characteristic.RotationSpeed, this.acStates.fan);
             }
-            setTimeout(this.refreshStatus.bind(this), 30000);
+            else {
+                this.pollFailures++;
+                nextPollMs = Math.min(AirConditionerAccessory.BASE_POLL_MS * Math.pow(2, this.pollFailures - 1), AirConditionerAccessory.MAX_POLL_MS);
+                this.log.error(`Failed to get AC status due to error ${body.msg}` +
+                    ` (retry ${this.pollFailures}, next poll in ${Math.round(nextPollMs / 1000)}s)`);
+            }
+            setTimeout(this.refreshStatus.bind(this), nextPollMs);
         });
     }
     setOn(value) {
@@ -216,4 +223,7 @@ class AirConditionerAccessory extends BaseAccessory_1.BaseAccessory {
     }
 }
 exports.AirConditionerAccessory = AirConditionerAccessory;
+// Polling backoff: on consecutive failures, increase interval up to 5 min.
+AirConditionerAccessory.BASE_POLL_MS = 30000; // 30 s
+AirConditionerAccessory.MAX_POLL_MS = 300000; // 5 min
 //# sourceMappingURL=AirConditionerAccessory.js.map

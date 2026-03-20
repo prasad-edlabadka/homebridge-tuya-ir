@@ -13,6 +13,9 @@ export declare class AirConditionerAccessory extends BaseAccessory {
     private modeList;
     private modeCode;
     private acStates;
+    private static readonly BASE_POLL_MS;
+    private static readonly MAX_POLL_MS;
+    private pollFailures;
     constructor(platform: TuyaIRPlatform, accessory: PlatformAccessory);
     getTemperatureRange(): void;
     /**

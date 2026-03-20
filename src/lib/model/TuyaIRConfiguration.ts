@@ -16,7 +16,7 @@ export class TuyaIRConfiguration {
         this.deviceRegion = config.deviceRegion;
         this.irDeviceId = config.smartIR[index].deviceId;
         this.autoFetchRemotesFromServer = config.smartIR[index].autoFetchRemotesFromServer;
-        this.configuredRemotes = config.smartIR[index].configuredRemotes?.map(v => new Device(v));
+        this.configuredRemotes = config.smartIR[index].configuredRemotes?.map(v => new Device(v)) ?? [];
         this.apiHost = `https://openapi.tuya${this.deviceRegion}.com`;
     }
 }

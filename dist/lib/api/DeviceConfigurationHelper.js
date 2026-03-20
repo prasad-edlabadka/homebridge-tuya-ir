@@ -31,6 +31,11 @@ class DeviceConfigurationHelper extends BaseHelper_1.BaseHelper {
         });
     }
     manualFetch(cb) {
+        if (!this.config.configuredRemotes || this.config.configuredRemotes.length === 0) {
+            this.log.warn("No configured remotes found. Nothing to fetch manually.");
+            cb([]);
+            return;
+        }
         const devs = [];
         for (let i = 0; i < this.config.configuredRemotes.length; i++) {
             const dev = this.config.configuredRemotes[i];

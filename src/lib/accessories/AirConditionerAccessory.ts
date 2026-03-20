@@ -20,6 +20,11 @@ export class AirConditionerAccessory extends BaseAccessory {
     mode: 0,
   };
 
+  // Polling backoff: on consecutive failures, increase interval up to 5 min.
+  private static readonly BASE_POLL_MS = 30_000;   // 30 s
+  private static readonly MAX_POLL_MS = 300_000;    // 5 min
+  private pollFailures = 0;
+
   constructor(
     private readonly platform: TuyaIRPlatform,
     private readonly accessory: PlatformAccessory,
@@ -159,9 +164,10 @@ export class AirConditionerAccessory extends BaseAccessory {
       this.parentId,
       this.accessory.context.device.id,
       (body) => {
-        if (!body.success) {
-          this.log.error(`Failed to get AC status due to error ${body.msg}`);
-        } else {
+        let nextPollMs: number;
+        if (body.success) {
+          this.pollFailures = 0;
+          nextPollMs = AirConditionerAccessory.BASE_POLL_MS;
           this.log.debug(
             `${this.accessory.displayName} status is ${JSON.stringify(
               body.result,
@@ -189,8 +195,18 @@ export class AirConditionerAccessory extends BaseAccessory {
             this.platform.Characteristic.RotationSpeed,
             this.acStates.fan,
           );
+        } else {
+          this.pollFailures++;
+          nextPollMs = Math.min(
+            AirConditionerAccessory.BASE_POLL_MS * Math.pow(2, this.pollFailures - 1),
+            AirConditionerAccessory.MAX_POLL_MS,
+          );
+          this.log.error(
+            `Failed to get AC status due to error ${body.msg}` +
+            ` (retry ${this.pollFailures}, next poll in ${Math.round(nextPollMs / 1000)}s)`,
+          );
         }
-        setTimeout(this.refreshStatus.bind(this), 30000);
+        setTimeout(this.refreshStatus.bind(this), nextPollMs);
       },
     );
   }
