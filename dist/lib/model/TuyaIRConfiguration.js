@@ -18,7 +18,19 @@ class TuyaIRConfiguration {
         this.irDeviceId = config.smartIR[index].deviceId;
         this.autoFetchRemotesFromServer = config.smartIR[index].autoFetchRemotesFromServer;
         this.configuredRemotes = (_a = config.smartIR[index].configuredRemotes) === null || _a === void 0 ? void 0 : _a.map(v => new Device_1.Device(v));
-        this.apiHost = `https://openapi.tuya${this.deviceRegion}.com`;
+        switch (this.deviceRegion) {
+            case "sg":
+                this.apiHost = "https://openapi-sg.iotbing.com";
+                break;
+            case "ueaz":
+                this.apiHost = "https://openapi-ueaz.tuyaus.com";
+                break;
+            case "weaz":
+                this.apiHost = "https://openapi-weaz.tuyaeu.com";
+                break;
+            default:
+                this.apiHost = `https://openapi.tuya${this.deviceRegion}.com`;
+        }
     }
 }
 exports.TuyaIRConfiguration = TuyaIRConfiguration;

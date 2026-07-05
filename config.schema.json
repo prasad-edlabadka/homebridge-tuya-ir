@@ -55,6 +55,24 @@
             "enum": [
               "us"
             ]
+          },
+          {
+            "title": "Singapore",
+            "enum": [
+              "sg"
+            ]
+          },
+          {
+            "title": "Eastern America",
+            "enum": [
+              "ueaz"
+            ]
+          },
+          {
+            "title": "Western Europe",
+            "enum": [
+              "weaz"
+            ]
           }
         ]
       },

@@ -5,7 +5,7 @@ export class BaseHelper {
     protected apiHost: string;
 
     constructor(protected config: TuyaIRConfiguration, protected log: Logger) {
-        this.apiHost = `https://openapi.tuya${this.config.deviceRegion}.com`;
+        this.apiHost = this.config.apiHost;
     }
 
 }
