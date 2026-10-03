@@ -2,7 +2,7 @@ import { Logger } from "homebridge";
 import { TuyaIRConfiguration } from "../model/TuyaIRConfiguration";
 import { BaseHelper } from "./BaseHelper";
 export declare class LoginHelper extends BaseHelper {
-    private static _instance;
+    private static instances;
     private accessToken;
     private refreshToken;
     private constructor();

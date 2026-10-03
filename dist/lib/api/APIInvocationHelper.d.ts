@@ -1,4 +1,3 @@
-/// <reference types="node" />
 import { Logger } from 'homebridge';
 import { URL } from 'url';
 import { TuyaIRConfiguration } from '../model/TuyaIRConfiguration';
@@ -11,7 +10,8 @@ export declare class APIInvocationHelper {
         timestamp: number;
         signKey: string;
     };
-    static invokeTuyaIrApi(log: Logger, config: TuyaIRConfiguration, endpoint: string, method: string, body: object, callback: any): void;
+    static invokeTuyaIrApi(log: Logger, config: TuyaIRConfiguration, endpoint: string, method: string, body: object, callback: any, hasSwitched?: boolean): void;
+    private static isQuotaError;
     private static calculateSign;
     private static stringToSign;
 }

@@ -26,6 +26,79 @@
         "default": "",
         "description": "Your Tuya IOT cloud project's secret"
       },
+      "tuyaProjects": {
+        "title": "Tuya Cloud Projects",
+        "type": "array",
+        "description": "Tuya Cloud projects used for automatic API quota failover",
+        "items": {
+          "type": "object",
+          "title": "Tuya Cloud Project",
+          "properties": {
+            "clientId": {
+              "title": "Client ID",
+              "type": "string",
+              "required": true,
+              "default": ""
+            },
+            "secret": {
+              "title": "Client Secret",
+              "type": "string",
+              "required": true,
+              "default": ""
+            },
+            "region": {
+              "title": "Region",
+              "type": "string",
+              "required": false,
+              "default": "",
+              "oneOf": [
+                {
+                  "title": "India",
+                  "enum": [
+                    "in"
+                  ]
+                },
+                {
+                  "title": "Europe",
+                  "enum": [
+                    "eu"
+                  ]
+                },
+                {
+                  "title": "China",
+                  "enum": [
+                    "cn"
+                  ]
+                },
+                {
+                  "title": "America",
+                  "enum": [
+                    "us"
+                  ]
+                },
+                {
+                  "title": "Singapore",
+                  "enum": [
+                    "sg"
+                  ]
+                },
+                {
+                  "title": "Eastern America",
+                  "enum": [
+                    "ueaz"
+                  ]
+                },
+                {
+                  "title": "Western Europe",
+                  "enum": [
+                    "weaz"
+                  ]
+                }
+              ]
+            }
+          }
+        }
+      },
       "deviceRegion": {
         "title": "Device Region",
         "type": "string",

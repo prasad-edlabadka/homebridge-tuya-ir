@@ -6,7 +6,7 @@ import { APIInvocationHelper } from "./APIInvocationHelper";
 import { BaseHelper } from "./BaseHelper";
 
 export class LoginHelper extends BaseHelper {
-    private static _instance: LoginHelper;
+    private static instances = new Map<string, LoginHelper>();
     private accessToken = "";
     private refreshToken = "";
 
@@ -15,7 +15,15 @@ export class LoginHelper extends BaseHelper {
     }
 
     public static Instance(config: TuyaIRConfiguration, log: Logger) {
-        return this._instance || (this._instance = new this(config, log));
+        const clientId = config.tuyaAPIClientId;
+        let instance = this.instances.get(clientId);
+
+        if (!instance) {
+            instance = new this(config, log);
+            this.instances.set(clientId, instance);
+        }
+
+        return instance;
     }
 
     getAccessToken() {
@@ -93,7 +101,7 @@ export class LoginHelper extends BaseHelper {
                 this.log.info(`Token refreshed successfully. Next refresh after ${body.result.expire_time} seconds`);
             } else {
                 this.log.error(`Unable to refresh token: ${body.msg}. Trying fresh login...`);
-                this.login();
+                void this.login();
             }
         });
     }
@@ -112,7 +120,7 @@ export class LoginHelper extends BaseHelper {
     private handleLoginError(errorMessage) {
         this.log.error(`Failed to login due to error '${errorMessage}'. Retying after 1 minute...`);
         setTimeout(() => {
-            this.login();
+           void this.login();
         }, 60000);
     }
 

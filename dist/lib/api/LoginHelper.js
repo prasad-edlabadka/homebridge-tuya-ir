@@ -15,7 +15,13 @@ class LoginHelper extends BaseHelper_1.BaseHelper {
         this.refreshToken = "";
     }
     static Instance(config, log) {
-        return this._instance || (this._instance = new this(config, log));
+        const clientId = config.tuyaAPIClientId;
+        let instance = this.instances.get(clientId);
+        if (!instance) {
+            instance = new this(config, log);
+            this.instances.set(clientId, instance);
+        }
+        return instance;
     }
     getAccessToken() {
         return this.accessToken;
@@ -89,7 +95,7 @@ class LoginHelper extends BaseHelper_1.BaseHelper {
             }
             else {
                 this.log.error(`Unable to refresh token: ${body.msg}. Trying fresh login...`);
-                this.login();
+                void this.login();
             }
         });
     }
@@ -105,9 +111,10 @@ class LoginHelper extends BaseHelper_1.BaseHelper {
     handleLoginError(errorMessage) {
         this.log.error(`Failed to login due to error '${errorMessage}'. Retying after 1 minute...`);
         setTimeout(() => {
-            this.login();
+            void this.login();
         }, 60000);
     }
 }
 exports.LoginHelper = LoginHelper;
+LoginHelper.instances = new Map();
 //# sourceMappingURL=LoginHelper.js.map
